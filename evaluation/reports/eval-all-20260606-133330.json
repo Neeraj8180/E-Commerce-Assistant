@@ -1,0 +1,1023 @@
+{
+  "summary": {
+    "total": 16,
+    "intent_accuracy": 1.0,
+    "task_success_rate": 0.812,
+    "tool_correctness": 0.938,
+    "grounded_rate": 0.875,
+    "hallucination_rate": 0.125,
+    "avg_latency_ms": 20572.3,
+    "p50_latency_ms": 23761,
+    "p95_latency_ms": 29694,
+    "p99_latency_ms": 29694,
+    "composite_score": 0.725
+  },
+  "failures": [
+    {
+      "case_id": "ret-001",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 25456ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "approved_auto",
+      "actual_tools": [
+        "get_order",
+        "search_policies",
+        "shopify_create_return",
+        "stripe_process_refund"
+      ],
+      "latency_ms": 25456,
+      "expected": {
+        "id": "ret-001",
+        "query": "I want to return order ORD-1001, didn't fit.",
+        "user_id": "alice@example.com",
+        "context": {
+          "order_id": "ORD-1001",
+          "reason": "didn't fit"
+        },
+        "expected_intent": "return",
+        "expected_outcome": "approved_auto",
+        "expected_tools": [
+          "get_order",
+          "search_policies",
+          "shopify_create_return",
+          "stripe_process_refund"
+        ]
+      }
+    },
+    {
+      "case_id": "ret-002",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 13963ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "approved_manager_review",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 13963,
+      "expected": {
+        "id": "ret-002",
+        "query": "I need to return the headphones from ORD-1002, changed mind.",
+        "user_id": "bob@example.com",
+        "context": {
+          "order_id": "ORD-1002",
+          "reason": "changed mind",
+          "item_skus": [
+            "HEADPHONES-X1"
+          ]
+        },
+        "expected_intent": "return",
+        "expected_outcome": "approved_manager_review",
+        "expected_tools": [
+          "get_order",
+          "search_policies"
+        ]
+      }
+    },
+    {
+      "case_id": "ret-003",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 23761ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "rejected_window",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 23761,
+      "expected": {
+        "id": "ret-003",
+        "query": "Can I still return ORD-1003? too old.",
+        "user_id": "carol@example.com",
+        "context": {
+          "order_id": "ORD-1003",
+          "reason": "too old"
+        },
+        "expected_intent": "return",
+        "expected_outcome": "rejected_window",
+        "expected_tools": [
+          "get_order",
+          "search_policies"
+        ]
+      }
+    },
+    {
+      "case_id": "ret-004",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 15587ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "rejected_status",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 15587,
+      "expected": {
+        "id": "ret-004",
+        "query": "Return ORD-1004, don't want it.",
+        "user_id": "alice@example.com",
+        "context": {
+          "order_id": "ORD-1004",
+          "reason": "don't want it"
+        },
+        "expected_intent": "return",
+        "expected_outcome": "rejected_status",
+        "expected_tools": [
+          "get_order",
+          "search_policies"
+        ]
+      }
+    },
+    {
+      "case_id": "ret-005",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 12702ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "rejected_status",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 12702,
+      "expected": {
+        "id": "ret-005",
+        "query": "Refund request for ORD-1005.",
+        "user_id": "bob@example.com",
+        "context": {
+          "order_id": "ORD-1005",
+          "reason": "changed mind"
+        },
+        "expected_intent": "return",
+        "expected_outcome": "rejected_status",
+        "expected_tools": [
+          "get_order",
+          "search_policies"
+        ]
+      }
+    },
+    {
+      "case_id": "ret-006",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 25295ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "approved_manager_review",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 25295,
+      "expected": {
+        "id": "ret-006",
+        "query": "I want to return my tablet, order ORD-1006.",
+        "user_id": "carol@example.com",
+        "context": {
+          "order_id": "ORD-1006",
+          "reason": "defective"
+        },
+        "expected_intent": "return",
+        "expected_outcome": "approved_manager_review",
+        "expected_tools": [
+          "get_order",
+          "search_policies"
+        ]
+      }
+    },
+    {
+      "case_id": "ret-007",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 16057ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "rejected_status",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 16057,
+      "expected": {
+        "id": "ret-007",
+        "query": "Refund ORD-1008 please.",
+        "user_id": "alice@example.com",
+        "context": {
+          "order_id": "ORD-1008",
+          "reason": "changed mind"
+        },
+        "expected_intent": "return",
+        "expected_outcome": "rejected_status",
+        "expected_tools": [
+          "get_order",
+          "search_policies"
+        ]
+      }
+    },
+    {
+      "case_id": "ret-008",
+      "intent_correct": true,
+      "outcome_correct": false,
+      "tools_correct": false,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.4,
+      "failure_reasons": [
+        "wrong_outcome: expected approved_auto, got approved_manager_review",
+        "missing_tools: ['shopify_create_return', 'stripe_process_refund']",
+        "slow_latency: 25159ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "approved_manager_review",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 25159,
+      "expected": {
+        "id": "ret-008",
+        "query": "Refund order ORD-1009, size issue.",
+        "user_id": "bob@example.com",
+        "context": {
+          "order_id": "ORD-1009",
+          "reason": "size issue"
+        },
+        "expected_intent": "return",
+        "expected_outcome": "approved_auto",
+        "expected_tools": [
+          "get_order",
+          "search_policies",
+          "shopify_create_return",
+          "stripe_process_refund"
+        ]
+      }
+    },
+    {
+      "case_id": "ret-009",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 28847ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "approved_auto",
+      "actual_tools": [
+        "get_order",
+        "search_policies",
+        "shopify_create_return",
+        "stripe_process_refund"
+      ],
+      "latency_ms": 28847,
+      "expected": {
+        "id": "ret-009",
+        "query": "Return ORD-1010 \u2014 damaged in transit.",
+        "user_id": "carol@example.com",
+        "context": {
+          "order_id": "ORD-1010",
+          "reason": "damaged in transit",
+          "item_skus": [
+            "BOOK-COOK-01"
+          ]
+        },
+        "expected_intent": "return",
+        "expected_outcome": "approved_auto",
+        "expected_tools": [
+          "get_order",
+          "search_policies",
+          "shopify_create_return",
+          "stripe_process_refund"
+        ]
+      }
+    },
+    {
+      "case_id": "ret-010",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 13883ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "rejected_not_found",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 13883,
+      "expected": {
+        "id": "ret-010",
+        "query": "Please process return for ORD-9999.",
+        "user_id": "alice@example.com",
+        "context": {
+          "order_id": "ORD-9999",
+          "reason": "didn't fit"
+        },
+        "expected_intent": "return",
+        "expected_outcome": "rejected_not_found",
+        "expected_tools": [
+          "get_order",
+          "search_policies"
+        ]
+      }
+    },
+    {
+      "case_id": "ret-011",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 24447ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "missing_order_id",
+      "actual_tools": [
+        "search_policies"
+      ],
+      "latency_ms": 24447,
+      "expected": {
+        "id": "ret-011",
+        "query": "Hi, I want to return something I ordered.",
+        "user_id": "bob@example.com",
+        "context": {},
+        "expected_intent": "return",
+        "expected_outcome": "missing_order_id",
+        "expected_tools": [
+          "search_policies"
+        ]
+      }
+    },
+    {
+      "case_id": "ret-012",
+      "intent_correct": true,
+      "outcome_correct": false,
+      "tools_correct": true,
+      "grounded": false,
+      "latency_score": 0.0,
+      "composite": 0.4,
+      "failure_reasons": [
+        "wrong_outcome: expected approved_auto, got fallback_ungrounded",
+        "hallucination_detected",
+        "slow_latency: 29694ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "fallback_ungrounded",
+      "actual_tools": [
+        "get_order",
+        "search_policies",
+        "shopify_create_return",
+        "stripe_process_refund"
+      ],
+      "latency_ms": 29694,
+      "expected": {
+        "id": "ret-012",
+        "query": "Please refund my order ORD-1001 \u2014 didn't fit.",
+        "user_id": "carol@example.com",
+        "context": {
+          "order_id": "ORD-1001",
+          "reason": "didn't fit"
+        },
+        "expected_intent": "return",
+        "expected_outcome": "approved_auto",
+        "expected_tools": [
+          "get_order",
+          "search_policies",
+          "shopify_create_return",
+          "stripe_process_refund"
+        ]
+      }
+    },
+    {
+      "case_id": "ret-013",
+      "intent_correct": true,
+      "outcome_correct": false,
+      "tools_correct": true,
+      "grounded": false,
+      "latency_score": 0.0,
+      "composite": 0.4,
+      "failure_reasons": [
+        "wrong_outcome: expected approved_manager_review, got fallback_ungrounded",
+        "hallucination_detected",
+        "slow_latency: 15031ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "fallback_ungrounded",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 15031,
+      "expected": {
+        "id": "ret-013",
+        "query": "Refund ORD-1002 \u2014 changed mind.",
+        "user_id": "alice@example.com",
+        "context": {
+          "order_id": "ORD-1002",
+          "reason": "changed mind",
+          "item_skus": [
+            "HEADPHONES-X1"
+          ]
+        },
+        "expected_intent": "return",
+        "expected_outcome": "approved_manager_review",
+        "expected_tools": [
+          "get_order",
+          "search_policies"
+        ]
+      }
+    },
+    {
+      "case_id": "ret-014",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 13450ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "rejected_window",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 13450,
+      "expected": {
+        "id": "ret-014",
+        "query": "Return ORD-1003 please.",
+        "user_id": "bob@example.com",
+        "context": {
+          "order_id": "ORD-1003",
+          "reason": "too old"
+        },
+        "expected_intent": "return",
+        "expected_outcome": "rejected_window",
+        "expected_tools": [
+          "get_order",
+          "search_policies"
+        ]
+      }
+    },
+    {
+      "case_id": "ret-015",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 16430ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "rejected_status",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 16430,
+      "expected": {
+        "id": "ret-015",
+        "query": "Please process a return for ORD-1004.",
+        "user_id": "carol@example.com",
+        "context": {
+          "order_id": "ORD-1004",
+          "reason": "don't want it"
+        },
+        "expected_intent": "return",
+        "expected_outcome": "rejected_status",
+        "expected_tools": [
+          "get_order",
+          "search_policies"
+        ]
+      }
+    },
+    {
+      "case_id": "exc-001",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 29395ms"
+      ],
+      "actual_intent": "exchange",
+      "actual_outcome": "exchange_created",
+      "actual_tools": [
+        "get_order",
+        "search_policies",
+        "shopify_create_exchange"
+      ],
+      "latency_ms": 29395,
+      "expected": {
+        "id": "exc-001",
+        "query": "I want to exchange my jeans for a different size, order ORD-1009.",
+        "user_id": "alice@example.com",
+        "context": {
+          "order_id": "ORD-1009",
+          "original_sku": "JEANS-BLU-32",
+          "new_sku": "JEANS-BLU-33",
+          "reason": "size issue"
+        },
+        "expected_intent": "exchange",
+        "expected_outcome": "exchange_created",
+        "expected_tools": [
+          "get_order",
+          "search_policies",
+          "shopify_create_exchange"
+        ]
+      }
+    },
+    {
+      "id": "exc-002",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "exc-003",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "exc-004",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "exc-005",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "exc-006",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "exc-007",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "exc-008",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "exc-009",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "exc-010",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "exc-011",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "exc-012",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "exc-013",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "exc-014",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "exc-015",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "wis-001",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "wis-002",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "wis-003",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "wis-004",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "wis-005",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "wis-006",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "wis-007",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "wis-008",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "wis-009",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "wis-010",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "wis-011",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "wis-012",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "wis-013",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "wis-014",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    },
+    {
+      "id": "wis-015",
+      "error": "Server error '502 Bad Gateway' for url 'http://go-server:8080/chat'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502"
+    }
+  ],
+  "scores": [
+    {
+      "case_id": "ret-001",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 25456ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "approved_auto",
+      "actual_tools": [
+        "get_order",
+        "search_policies",
+        "shopify_create_return",
+        "stripe_process_refund"
+      ],
+      "latency_ms": 25456
+    },
+    {
+      "case_id": "ret-002",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 13963ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "approved_manager_review",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 13963
+    },
+    {
+      "case_id": "ret-003",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 23761ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "rejected_window",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 23761
+    },
+    {
+      "case_id": "ret-004",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 15587ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "rejected_status",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 15587
+    },
+    {
+      "case_id": "ret-005",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 12702ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "rejected_status",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 12702
+    },
+    {
+      "case_id": "ret-006",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 25295ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "approved_manager_review",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 25295
+    },
+    {
+      "case_id": "ret-007",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 16057ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "rejected_status",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 16057
+    },
+    {
+      "case_id": "ret-008",
+      "intent_correct": true,
+      "outcome_correct": false,
+      "tools_correct": false,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.4,
+      "failure_reasons": [
+        "wrong_outcome: expected approved_auto, got approved_manager_review",
+        "missing_tools: ['shopify_create_return', 'stripe_process_refund']",
+        "slow_latency: 25159ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "approved_manager_review",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 25159
+    },
+    {
+      "case_id": "ret-009",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 28847ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "approved_auto",
+      "actual_tools": [
+        "get_order",
+        "search_policies",
+        "shopify_create_return",
+        "stripe_process_refund"
+      ],
+      "latency_ms": 28847
+    },
+    {
+      "case_id": "ret-010",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 13883ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "rejected_not_found",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 13883
+    },
+    {
+      "case_id": "ret-011",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 24447ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "missing_order_id",
+      "actual_tools": [
+        "search_policies"
+      ],
+      "latency_ms": 24447
+    },
+    {
+      "case_id": "ret-012",
+      "intent_correct": true,
+      "outcome_correct": false,
+      "tools_correct": true,
+      "grounded": false,
+      "latency_score": 0.0,
+      "composite": 0.4,
+      "failure_reasons": [
+        "wrong_outcome: expected approved_auto, got fallback_ungrounded",
+        "hallucination_detected",
+        "slow_latency: 29694ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "fallback_ungrounded",
+      "actual_tools": [
+        "get_order",
+        "search_policies",
+        "shopify_create_return",
+        "stripe_process_refund"
+      ],
+      "latency_ms": 29694
+    },
+    {
+      "case_id": "ret-013",
+      "intent_correct": true,
+      "outcome_correct": false,
+      "tools_correct": true,
+      "grounded": false,
+      "latency_score": 0.0,
+      "composite": 0.4,
+      "failure_reasons": [
+        "wrong_outcome: expected approved_manager_review, got fallback_ungrounded",
+        "hallucination_detected",
+        "slow_latency: 15031ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "fallback_ungrounded",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 15031
+    },
+    {
+      "case_id": "ret-014",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 13450ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "rejected_window",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 13450
+    },
+    {
+      "case_id": "ret-015",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 16430ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "rejected_status",
+      "actual_tools": [
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 16430
+    },
+    {
+      "case_id": "exc-001",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.0,
+      "composite": 0.8,
+      "failure_reasons": [
+        "slow_latency: 29395ms"
+      ],
+      "actual_intent": "exchange",
+      "actual_outcome": "exchange_created",
+      "actual_tools": [
+        "get_order",
+        "search_policies",
+        "shopify_create_exchange"
+      ],
+      "latency_ms": 29395
+    }
+  ]
+}

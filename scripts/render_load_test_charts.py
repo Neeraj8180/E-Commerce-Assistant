@@ -23,44 +23,32 @@ PROOF = ROOT / "docs" / "proof"
 
 GROQ_RUN = {
     "label": "Groq (llama-3.3-70b-versatile)",
-    "concurrency": 100,
-    "total": 100,
-    "success": 100,
-    "p50_ms": 9020,
-    "p95_ms": 10291,
-    "p99_ms": 10320,
-    "avg_ms": 7920,
-    "rps": 9.65,
-    "status_codes": {"200": 100},
-    "query_mix": {"returns": 26, "exchanges": 30, "wismo": 44},
+    "concurrency": 30,
+    "total": 30,
+    "http_200": 30,
+    "real_success": 5,
+    "fallback": 25,
+    "p50_ms": 15657,
+    "p95_ms": 16079,
+    "p99_ms": 16100,
+    "avg_ms": 14426,
+    "rps": 1.86,
+    "query_mix": {"returns": 9, "exchanges": 8, "wismo": 13},
 }
 
-LOCAL_RUNS = [
-    {
-        "label": "5 concurrent",
-        "concurrency": 5,
-        "total": 30,
-        "success": 24,
-        "p50_ms": 109884,
-        "p95_ms": 179316,
-        "p99_ms": 179633,
-        "avg_ms": 104768,
-        "rps": 0.04,
-        "status_codes": {"200": 24, "502": 3, "exception": 3},
-    },
-    {
-        "label": "100 concurrent (stress)",
-        "concurrency": 100,
-        "total": 100,
-        "success": 4,
-        "p50_ms": 81402,
-        "p95_ms": 81747,
-        "p99_ms": 81747,
-        "avg_ms": 77772,
-        "rps": 0.55,
-        "status_codes": {"200": 4, "502": 1, "exception": 95},
-    },
-]
+LOCAL_RUN = {
+    "label": "Local Ollama (llama3.2, CPU-only)",
+    "concurrency": 5,
+    "total": 30,
+    "http_200": 24,
+    "real_success": 24,
+    "p50_ms": 109884,
+    "p95_ms": 179316,
+    "p99_ms": 179633,
+    "avg_ms": 104768,
+    "rps": 0.04,
+    "errors": 6,
+}
 
 
 def _save(path: Path) -> None:
@@ -79,72 +67,76 @@ def render_groq() -> None:
     ax1.set_ylabel("Latency (ms)")
     mix = GROQ_RUN["query_mix"]
     ax1.set_title(
-        f"Cloud — Groq ({GROQ_RUN['concurrency']} concurrent users)\n"
-        f"{GROQ_RUN['total']} requests · {GROQ_RUN['rps']} req/s · "
+        f"Groq burst stress — {GROQ_RUN['concurrency']} concurrent users (free tier)\n"
+        f"{GROQ_RUN['total']} simultaneous requests · {GROQ_RUN['rps']} req/s · "
         f"mix returns/exchanges/WISMO = {mix['returns']}/{mix['exchanges']}/{mix['wismo']}"
     )
     for bar, val in zip(bars, values):
         ax1.text(
             bar.get_x() + bar.get_width() / 2,
             bar.get_height() + max(values) * 0.02,
-            f"{val} ms",
+            f"{val/1000:.1f}s",
             ha="center",
             fontsize=9,
         )
 
-    codes = GROQ_RUN["status_codes"]
-    code_labels = list(codes.keys())
-    code_values = list(codes.values())
-    colors = ["#16a34a" if k == "200" else "#dc2626" for k in code_labels]
-    ax2.bar(code_labels, code_values, color=colors)
-    ax2.set_ylabel("Count")
+    outcome_labels = ["Real outcome", "Graceful fallback\n(429 \u2192 retry \u2192 degrade)"]
+    outcome_values = [GROQ_RUN["real_success"], GROQ_RUN["fallback"]]
+    colors = ["#16a34a", "#f59e0b"]
+    bars2 = ax2.bar(outcome_labels, outcome_values, color=colors)
+    ax2.set_ylabel("Requests")
     ax2.set_title(
-        f"HTTP status codes — success rate {GROQ_RUN['success'] / GROQ_RUN['total'] * 100:.0f}%"
+        f"Outcome split — all 30 returned HTTP 200, no crashes\n"
+        f"upstream free-tier RPM cap absorbed {GROQ_RUN['fallback']}/{GROQ_RUN['total']} via graceful degradation"
     )
-    for i, val in enumerate(code_values):
-        ax2.text(i, val + max(code_values) * 0.02, str(val), ha="center", fontsize=9)
+    for bar, val in zip(bars2, outcome_values):
+        pct = val / GROQ_RUN["total"] * 100
+        ax2.text(
+            bar.get_x() + bar.get_width() / 2,
+            val + max(outcome_values) * 0.03,
+            f"{val}  ({pct:.0f}%)",
+            ha="center",
+            fontsize=10,
+        )
 
     _save(PROOF / "load-test-groq.png")
 
 
 def render_local() -> None:
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5.5))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
 
-    runs = LOCAL_RUNS
-    width = 0.35
-    x = list(range(4))
+    run = LOCAL_RUN
     labels = ["p50", "p95", "p99", "avg"]
-
-    series_a = [runs[0]["p50_ms"], runs[0]["p95_ms"], runs[0]["p99_ms"], runs[0]["avg_ms"]]
-    series_b = [runs[1]["p50_ms"], runs[1]["p95_ms"], runs[1]["p99_ms"], runs[1]["avg_ms"]]
-
-    ax1.bar([i - width / 2 for i in x], series_a, width, label=runs[0]["label"], color="#2563eb")
-    ax1.bar([i + width / 2 for i in x], series_b, width, label=runs[1]["label"], color="#dc2626")
-    ax1.set_xticks(x)
-    ax1.set_xticklabels(labels)
+    values = [run["p50_ms"], run["p95_ms"], run["p99_ms"], run["avg_ms"]]
+    bars = ax1.bar(labels, values, color=["#2563eb", "#7c3aed", "#dc2626", "#0f766e"])
     ax1.set_ylabel("Latency (ms)")
     ax1.set_title(
-        "Local — Ollama (llama3.2, CPU-only laptop, no GPU)\n"
-        f"5-concurrent: {runs[0]['rps']} req/s · 100-concurrent stress: {runs[1]['rps']} req/s"
+        f"Local Ollama — {run['concurrency']} concurrent, {run['total']} requests\n"
+        f"{run['rps']} req/s   (llama3.2 on CPU, no GPU)"
     )
-    ax1.legend()
-    for xi, val in zip([i - width / 2 for i in x], series_a):
-        ax1.text(xi, val + max(series_a + series_b) * 0.02, f"{val/1000:.0f}s", ha="center", fontsize=8)
-    for xi, val in zip([i + width / 2 for i in x], series_b):
-        ax1.text(xi, val + max(series_a + series_b) * 0.02, f"{val/1000:.0f}s", ha="center", fontsize=8)
+    for bar, val in zip(bars, values):
+        ax1.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + max(values) * 0.02,
+            f"{val/1000:.0f}s",
+            ha="center",
+            fontsize=9,
+        )
 
-    success_labels = [r["label"] for r in runs]
-    success_values = [r["success"] / r["total"] * 100 for r in runs]
+    outcome_labels = ["Real outcome", "Timeout / 5xx"]
+    outcome_values = [run["real_success"], run["errors"]]
     colors = ["#16a34a", "#dc2626"]
-    bars = ax2.bar(success_labels, success_values, color=colors)
-    ax2.set_ylim(0, 100)
-    ax2.set_ylabel("Success rate (%)")
-    ax2.set_title("Local success rate by concurrency")
-    for bar, val, run in zip(bars, success_values, runs):
+    bars2 = ax2.bar(outcome_labels, outcome_values, color=colors)
+    ax2.set_ylabel("Requests")
+    ax2.set_title(
+        f"Outcome split — {run['real_success']}/{run['total']} real successes ({run['real_success']/run['total']*100:.0f}%)"
+    )
+    for bar, val in zip(bars2, outcome_values):
+        pct = val / run["total"] * 100
         ax2.text(
             bar.get_x() + bar.get_width() / 2,
-            val + 2,
-            f"{val:.0f}%  ({run['success']}/{run['total']})",
+            val + max(outcome_values) * 0.03,
+            f"{val}  ({pct:.0f}%)",
             ha="center",
             fontsize=10,
         )

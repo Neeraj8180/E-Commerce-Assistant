@@ -7,16 +7,12 @@ latency on `llama-3.3-70b-versatile` and similar models.
 
 from __future__ import annotations
 
+import asyncio
 import logging
+import random
 from typing import Any
 
 import httpx
-from tenacity import (
-    AsyncRetrying,
-    retry_if_exception_type,
-    stop_after_attempt,
-    wait_exponential,
-)
 
 from app.config import settings
 from app.llm.base import LLMResponse
@@ -100,20 +96,70 @@ class GroqProvider:
         return await self._embedder.embed(text)
 
     async def _post_json(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
+        """POST with explicit 429-aware backoff.
+
+        Groq returns 429 with a `Retry-After` header (seconds) and/or
+        `x-ratelimit-reset-*` hints when the per-minute request or token
+        budget is exhausted. We honor `Retry-After` first, then fall back
+        to exponential backoff with jitter. 5xx errors and transient
+        network failures are retried the same way.
+        """
         url = self.base_url + path
-        retryable = (httpx.TimeoutException, httpx.NetworkError, httpx.RemoteProtocolError)
-        async for attempt in AsyncRetrying(
-            stop=stop_after_attempt(3),
-            wait=wait_exponential(multiplier=0.5, min=0.5, max=4),
-            retry=retry_if_exception_type(retryable),
-            reraise=True,
-        ):
-            with attempt:
+        max_attempts = 6
+        transient = (httpx.TimeoutException, httpx.NetworkError, httpx.RemoteProtocolError)
+
+        for attempt in range(1, max_attempts + 1):
+            try:
                 resp = await self._http().post(url, json=payload)
-                if resp.status_code == 429:
-                    raise httpx.HTTPStatusError("groq rate limited", request=resp.request, response=resp)
-                if resp.status_code >= 500:
-                    raise httpx.HTTPStatusError("groq 5xx", request=resp.request, response=resp)
-                resp.raise_for_status()
+            except transient as exc:
+                if attempt == max_attempts:
+                    raise
+                delay = min(2 ** attempt, 30) + random.uniform(0, 0.5)
+                log.warning("groq transient error (attempt %d/%d): %s; sleeping %.1fs",
+                            attempt, max_attempts, exc, delay)
+                await asyncio.sleep(delay)
+                continue
+
+            if resp.status_code < 400:
                 return resp.json()
+
+            if resp.status_code == 429 or resp.status_code >= 500:
+                if attempt == max_attempts:
+                    raise httpx.HTTPStatusError(
+                        f"groq {resp.status_code} after {max_attempts} attempts: {resp.text[:200]}",
+                        request=resp.request,
+                        response=resp,
+                    )
+                delay = self._compute_retry_delay(resp, attempt)
+                log.warning("groq %d (attempt %d/%d); sleeping %.1fs",
+                            resp.status_code, attempt, max_attempts, delay)
+                await asyncio.sleep(delay)
+                continue
+
+            resp.raise_for_status()
+            return resp.json()
+
         raise RuntimeError("unreachable")
+
+    @staticmethod
+    def _compute_retry_delay(resp: httpx.Response, attempt: int) -> float:
+        """Honor Retry-After if present, else exponential backoff with jitter.
+
+        Cap at 30 s so a misbehaving header can't stall the whole stack.
+        """
+        retry_after = resp.headers.get("retry-after") or resp.headers.get("Retry-After")
+        if retry_after:
+            try:
+                return min(float(retry_after), 30.0)
+            except ValueError:
+                pass
+        reset_hint = (
+            resp.headers.get("x-ratelimit-reset-tokens")
+            or resp.headers.get("x-ratelimit-reset-requests")
+        )
+        if reset_hint:
+            try:
+                return min(float(reset_hint.rstrip("s")), 30.0)
+            except ValueError:
+                pass
+        return min(2 ** attempt, 30) + random.uniform(0, 0.5)

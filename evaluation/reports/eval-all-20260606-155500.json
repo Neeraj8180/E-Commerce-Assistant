@@ -1,0 +1,532 @@
+{
+  "summary": {
+    "total": 15,
+    "intent_accuracy": 1.0,
+    "task_success_rate": 1.0,
+    "tool_correctness": 1.0,
+    "grounded_rate": 1.0,
+    "hallucination_rate": 0.0,
+    "avg_latency_ms": 1077.6,
+    "p50_latency_ms": 875,
+    "p95_latency_ms": 2164,
+    "p99_latency_ms": 2164,
+    "composite_score": 0.96
+  },
+  "failures": [
+    {
+      "case_id": "ret-001",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.5,
+      "composite": 0.9,
+      "failure_reasons": [
+        "slow_latency: 1440ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "approved_auto",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies",
+        "shopify_create_return",
+        "stripe_process_refund"
+      ],
+      "latency_ms": 1440,
+      "expected": {
+        "id": "ret-001",
+        "query": "I want to return order ORD-1001, didn't fit.",
+        "user_id": "alice@example.com",
+        "context": {
+          "order_id": "ORD-1001",
+          "reason": "didn't fit"
+        },
+        "expected_intent": "return",
+        "expected_outcome": "approved_auto",
+        "expected_tools": [
+          "get_order",
+          "search_policies",
+          "shopify_create_return",
+          "stripe_process_refund"
+        ]
+      }
+    },
+    {
+      "case_id": "exc-002",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.5,
+      "composite": 0.9,
+      "failure_reasons": [
+        "slow_latency: 1200ms"
+      ],
+      "actual_intent": "exchange",
+      "actual_outcome": "exchange_out_of_stock",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies",
+        "shopify_create_exchange"
+      ],
+      "latency_ms": 1200,
+      "expected": {
+        "id": "exc-002",
+        "query": "Exchange jeans (32) for 34 in ORD-1009.",
+        "user_id": "bob@example.com",
+        "context": {
+          "order_id": "ORD-1009",
+          "original_sku": "JEANS-BLU-32",
+          "new_sku": "JEANS-BLU-34",
+          "reason": "size issue"
+        },
+        "expected_intent": "exchange",
+        "expected_outcome": "exchange_out_of_stock",
+        "expected_tools": [
+          "get_order",
+          "search_policies",
+          "shopify_create_exchange"
+        ]
+      }
+    },
+    {
+      "case_id": "exc-004",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.5,
+      "composite": 0.9,
+      "failure_reasons": [
+        "slow_latency: 2164ms"
+      ],
+      "actual_intent": "exchange",
+      "actual_outcome": "exchange_created",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies",
+        "shopify_create_exchange"
+      ],
+      "latency_ms": 2164,
+      "expected": {
+        "id": "exc-004",
+        "query": "Need larger size for ORD-1001.",
+        "user_id": "alice@example.com",
+        "context": {
+          "order_id": "ORD-1001",
+          "original_sku": "TSHIRT-BLU-M",
+          "new_sku": "TSHIRT-BLU-L",
+          "reason": "size"
+        },
+        "expected_intent": "exchange",
+        "expected_outcome": "exchange_created",
+        "expected_tools": [
+          "get_order",
+          "search_policies",
+          "shopify_create_exchange"
+        ]
+      }
+    },
+    {
+      "case_id": "exc-005",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.5,
+      "composite": 0.9,
+      "failure_reasons": [
+        "slow_latency: 1624ms"
+      ],
+      "actual_intent": "exchange",
+      "actual_outcome": "exchange_created",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies",
+        "shopify_create_exchange"
+      ],
+      "latency_ms": 1624,
+      "expected": {
+        "id": "exc-005",
+        "query": "I'd like silver headphones for ORD-1002.",
+        "user_id": "bob@example.com",
+        "context": {
+          "order_id": "ORD-1002",
+          "original_sku": "HEADPHONES-X1",
+          "new_sku": "HEADPHONES-X1-SLV",
+          "reason": "color preference"
+        },
+        "expected_intent": "exchange",
+        "expected_outcome": "exchange_created",
+        "expected_tools": [
+          "get_order",
+          "search_policies",
+          "shopify_create_exchange"
+        ]
+      }
+    },
+    {
+      "case_id": "wis-002",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.5,
+      "composite": 0.9,
+      "failure_reasons": [
+        "slow_latency: 1053ms"
+      ],
+      "actual_intent": "order_status",
+      "actual_outcome": "delivered",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 1053,
+      "expected": {
+        "id": "wis-002",
+        "query": "status of order ORD-1001",
+        "user_id": "bob@example.com",
+        "context": {
+          "order_id": "ORD-1001"
+        },
+        "expected_intent": "order_status",
+        "expected_outcome": "delivered",
+        "expected_tools": [
+          "get_order",
+          "search_policies"
+        ]
+      }
+    },
+    {
+      "case_id": "wis-005",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.5,
+      "composite": 0.9,
+      "failure_reasons": [
+        "slow_latency: 1138ms"
+      ],
+      "actual_intent": "order_status",
+      "actual_outcome": "cancelled",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 1138,
+      "expected": {
+        "id": "wis-005",
+        "query": "is ORD-1008 still shipping?",
+        "user_id": "bob@example.com",
+        "context": {
+          "order_id": "ORD-1008"
+        },
+        "expected_intent": "order_status",
+        "expected_outcome": "cancelled",
+        "expected_tools": [
+          "get_order",
+          "search_policies"
+        ]
+      }
+    }
+  ],
+  "scores": [
+    {
+      "case_id": "ret-001",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.5,
+      "composite": 0.9,
+      "failure_reasons": [
+        "slow_latency: 1440ms"
+      ],
+      "actual_intent": "return",
+      "actual_outcome": "approved_auto",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies",
+        "shopify_create_return",
+        "stripe_process_refund"
+      ],
+      "latency_ms": 1440
+    },
+    {
+      "case_id": "ret-002",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 1.0,
+      "composite": 1.0,
+      "failure_reasons": [],
+      "actual_intent": "return",
+      "actual_outcome": "approved_manager_review",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 862
+    },
+    {
+      "case_id": "ret-003",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 1.0,
+      "composite": 1.0,
+      "failure_reasons": [],
+      "actual_intent": "return",
+      "actual_outcome": "rejected_window",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 831
+    },
+    {
+      "case_id": "ret-004",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 1.0,
+      "composite": 1.0,
+      "failure_reasons": [],
+      "actual_intent": "return",
+      "actual_outcome": "rejected_status",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 875
+    },
+    {
+      "case_id": "ret-005",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 1.0,
+      "composite": 1.0,
+      "failure_reasons": [],
+      "actual_intent": "return",
+      "actual_outcome": "rejected_status",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 832
+    },
+    {
+      "case_id": "exc-001",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 1.0,
+      "composite": 1.0,
+      "failure_reasons": [],
+      "actual_intent": "exchange",
+      "actual_outcome": "exchange_created",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies",
+        "shopify_create_exchange"
+      ],
+      "latency_ms": 820
+    },
+    {
+      "case_id": "exc-002",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.5,
+      "composite": 0.9,
+      "failure_reasons": [
+        "slow_latency: 1200ms"
+      ],
+      "actual_intent": "exchange",
+      "actual_outcome": "exchange_out_of_stock",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies",
+        "shopify_create_exchange"
+      ],
+      "latency_ms": 1200
+    },
+    {
+      "case_id": "exc-003",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 1.0,
+      "composite": 1.0,
+      "failure_reasons": [],
+      "actual_intent": "exchange",
+      "actual_outcome": "exchange_created",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies",
+        "shopify_create_exchange"
+      ],
+      "latency_ms": 865
+    },
+    {
+      "case_id": "exc-004",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.5,
+      "composite": 0.9,
+      "failure_reasons": [
+        "slow_latency: 2164ms"
+      ],
+      "actual_intent": "exchange",
+      "actual_outcome": "exchange_created",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies",
+        "shopify_create_exchange"
+      ],
+      "latency_ms": 2164
+    },
+    {
+      "case_id": "exc-005",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.5,
+      "composite": 0.9,
+      "failure_reasons": [
+        "slow_latency: 1624ms"
+      ],
+      "actual_intent": "exchange",
+      "actual_outcome": "exchange_created",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies",
+        "shopify_create_exchange"
+      ],
+      "latency_ms": 1624
+    },
+    {
+      "case_id": "wis-001",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 1.0,
+      "composite": 1.0,
+      "failure_reasons": [],
+      "actual_intent": "order_status",
+      "actual_outcome": "in_transit",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 664
+    },
+    {
+      "case_id": "wis-002",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.5,
+      "composite": 0.9,
+      "failure_reasons": [
+        "slow_latency: 1053ms"
+      ],
+      "actual_intent": "order_status",
+      "actual_outcome": "delivered",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 1053
+    },
+    {
+      "case_id": "wis-003",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 1.0,
+      "composite": 1.0,
+      "failure_reasons": [],
+      "actual_intent": "order_status",
+      "actual_outcome": "processing",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 962
+    },
+    {
+      "case_id": "wis-004",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 1.0,
+      "composite": 1.0,
+      "failure_reasons": [],
+      "actual_intent": "order_status",
+      "actual_outcome": "delayed",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 834
+    },
+    {
+      "case_id": "wis-005",
+      "intent_correct": true,
+      "outcome_correct": true,
+      "tools_correct": true,
+      "grounded": true,
+      "latency_score": 0.5,
+      "composite": 0.9,
+      "failure_reasons": [
+        "slow_latency: 1138ms"
+      ],
+      "actual_intent": "order_status",
+      "actual_outcome": "cancelled",
+      "actual_tools": [
+        "search_memory",
+        "get_order",
+        "search_policies"
+      ],
+      "latency_ms": 1138
+    }
+  ]
+}

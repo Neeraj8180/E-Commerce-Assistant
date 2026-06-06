@@ -1,0 +1,361 @@
+{
+  "summary": {
+    "concurrency": 5,
+    "dataset": "all",
+    "total": 30,
+    "success": 24,
+    "errors": 6,
+    "success_rate": 0.8,
+    "avg_latency_ms": 104768.4,
+    "p50_latency_ms": 109884,
+    "p95_latency_ms": 179316,
+    "p99_latency_ms": 179633,
+    "duration_ms": 773922,
+    "requests_per_second": 0.04,
+    "status_codes": {
+      "exception": 3,
+      "200": 24,
+      "502": 3
+    },
+    "error_samples": [
+      "ret-001: ",
+      "ret-004: ",
+      "ret-012: {\"error\":\"agent unavailable\",\"detail\":\"context deadline exceeded\",\"request_id\":\"87a00fb9-63d0-4e88-b9fa-9c83b0a28951\"}",
+      "ret-018: ",
+      "ret-019: {\"error\":\"agent unavailable\",\"detail\":\"context deadline exceeded\",\"request_id\":\"91bbf615-ead9-49f2-b052-07062c7667c9\"}",
+      "ret-025: {\"error\":\"agent unavailable\",\"detail\":\"context deadline exceeded\",\"request_id\":\"bb73a820-251d-4049-8778-e8f96b84c7cb\"}"
+    ]
+  },
+  "results": [
+    {
+      "case_id": "ret-001",
+      "user_id": "alice@example.com",
+      "status": "error",
+      "http_status": 0,
+      "latency_ms": 180048,
+      "intent": "",
+      "outcome": "",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "ret-002",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 115307,
+      "intent": "return",
+      "outcome": "approved_manager_review",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-003",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 24529,
+      "intent": "return",
+      "outcome": "rejected_window",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-004",
+      "user_id": "alice@example.com",
+      "status": "error",
+      "http_status": 0,
+      "latency_ms": 180040,
+      "intent": "",
+      "outcome": "",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "ret-005",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 46023,
+      "intent": "return",
+      "outcome": "rejected_status",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-006",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 121244,
+      "intent": "return",
+      "outcome": "approved_manager_review",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-007",
+      "user_id": "alice@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 108871,
+      "intent": "return",
+      "outcome": "rejected_status",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-008",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 114877,
+      "intent": "return",
+      "outcome": "approved_manager_review",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-009",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 118679,
+      "intent": "return",
+      "outcome": "approved_auto",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-010",
+      "user_id": "alice@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 118375,
+      "intent": "return",
+      "outcome": "rejected_not_found",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-011",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 117517,
+      "intent": "return",
+      "outcome": "missing_order_id",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-012",
+      "user_id": "carol@example.com",
+      "status": "error",
+      "http_status": 502,
+      "latency_ms": 180031,
+      "intent": "",
+      "outcome": "",
+      "error": "{\"error\":\"agent unavailable\",\"detail\":\"context deadline exceeded\",\"request_id\":\"87a00fb9-63d0-4e88-b9fa-9c83b0a28951\"}",
+      "memory_used": false
+    },
+    {
+      "case_id": "ret-013",
+      "user_id": "alice@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 116620,
+      "intent": "return",
+      "outcome": "approved_manager_review",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-014",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 105472,
+      "intent": "return",
+      "outcome": "rejected_window",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-015",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 109884,
+      "intent": "return",
+      "outcome": "rejected_status",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-016",
+      "user_id": "alice@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 179633,
+      "intent": "return",
+      "outcome": "rejected_status",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-017",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 60836,
+      "intent": "return",
+      "outcome": "approved_manager_review",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-018",
+      "user_id": "carol@example.com",
+      "status": "error",
+      "http_status": 0,
+      "latency_ms": 180010,
+      "intent": "",
+      "outcome": "",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "ret-019",
+      "user_id": "alice@example.com",
+      "status": "error",
+      "http_status": 502,
+      "latency_ms": 180011,
+      "intent": "",
+      "outcome": "",
+      "error": "{\"error\":\"agent unavailable\",\"detail\":\"context deadline exceeded\",\"request_id\":\"91bbf615-ead9-49f2-b052-07062c7667c9\"}",
+      "memory_used": false
+    },
+    {
+      "case_id": "ret-020",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 179316,
+      "intent": "return",
+      "outcome": "approved_auto",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-021",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 106777,
+      "intent": "return",
+      "outcome": "rejected_not_found",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-022",
+      "user_id": "alice@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 56785,
+      "intent": "return",
+      "outcome": "missing_order_id",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-023",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 121388,
+      "intent": "return",
+      "outcome": "approved_auto",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-024",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 109639,
+      "intent": "return",
+      "outcome": "approved_manager_review",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-025",
+      "user_id": "alice@example.com",
+      "status": "error",
+      "http_status": 502,
+      "latency_ms": 180034,
+      "intent": "",
+      "outcome": "",
+      "error": "{\"error\":\"agent unavailable\",\"detail\":\"context deadline exceeded\",\"request_id\":\"bb73a820-251d-4049-8778-e8f96b84c7cb\"}",
+      "memory_used": false
+    },
+    {
+      "case_id": "ret-026",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 106429,
+      "intent": "return",
+      "outcome": "rejected_status",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-027",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 109187,
+      "intent": "return",
+      "outcome": "rejected_status",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-028",
+      "user_id": "alice@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 57692,
+      "intent": "return",
+      "outcome": "approved_manager_review",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-029",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 91867,
+      "intent": "return",
+      "outcome": "rejected_status",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-030",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 117494,
+      "intent": "return",
+      "outcome": "fallback_ungrounded",
+      "error": "",
+      "memory_used": true
+    }
+  ]
+}

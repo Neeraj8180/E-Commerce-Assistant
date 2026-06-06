@@ -1,0 +1,352 @@
+{
+  "summary": {
+    "concurrency": 30,
+    "dataset": "all",
+    "total": 30,
+    "success": 30,
+    "errors": 0,
+    "success_rate": 1.0,
+    "avg_latency_ms": 14426.2,
+    "p50_latency_ms": 15657,
+    "p95_latency_ms": 16079,
+    "p99_latency_ms": 16100,
+    "duration_ms": 16129,
+    "requests_per_second": 1.86,
+    "status_codes": {
+      "200": 30
+    },
+    "error_samples": []
+  },
+  "results": [
+    {
+      "case_id": "exc-007",
+      "user_id": "alice@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 15328,
+      "intent": "exchange",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "wis-040",
+      "user_id": "alice@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 2588,
+      "intent": "order_status",
+      "outcome": "delivered",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-038",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 15392,
+      "intent": "return",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "ret-090",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 6520,
+      "intent": "return",
+      "outcome": "approved_manager_review",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "ret-033",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 4384,
+      "intent": "return",
+      "outcome": "missing_order_id",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "wis-051",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 16056,
+      "intent": "order_status",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "exc-093",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 15334,
+      "intent": "exchange",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "exc-021",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 16100,
+      "intent": "exchange",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "ret-020",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 15983,
+      "intent": "return",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "wis-026",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 16057,
+      "intent": "order_status",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "ret-025",
+      "user_id": "alice@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 16077,
+      "intent": "return",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "wis-096",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 15805,
+      "intent": "order_status",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "exc-004",
+      "user_id": "alice@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 15048,
+      "intent": "exchange",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "wis-021",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 14677,
+      "intent": "order_status",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "wis-006",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 15783,
+      "intent": "order_status",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "wis-098",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 15065,
+      "intent": "order_status",
+      "outcome": "fallback_ungrounded",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "wis-092",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 15784,
+      "intent": "order_status",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "ret-039",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 15637,
+      "intent": "return",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "exc-059",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 15618,
+      "intent": "exchange",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "exc-074",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 15657,
+      "intent": "exchange",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "wis-046",
+      "user_id": "alice@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 16052,
+      "intent": "order_status",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "ret-002",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 15623,
+      "intent": "return",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "wis-025",
+      "user_id": "alice@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 15622,
+      "intent": "order_status",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "wis-052",
+      "user_id": "alice@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 16035,
+      "intent": "order_status",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "exc-045",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 16079,
+      "intent": "exchange",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "exc-034",
+      "user_id": "alice@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 16059,
+      "intent": "exchange",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "wis-047",
+      "user_id": "bob@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 11056,
+      "intent": "order_status",
+      "outcome": "processing",
+      "error": "",
+      "memory_used": true
+    },
+    {
+      "case_id": "wis-007",
+      "user_id": "alice@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 15786,
+      "intent": "order_status",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "ret-087",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 15941,
+      "intent": "return",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    },
+    {
+      "case_id": "ret-006",
+      "user_id": "carol@example.com",
+      "status": "ok",
+      "http_status": 200,
+      "latency_ms": 15639,
+      "intent": "return",
+      "outcome": "fallback",
+      "error": "",
+      "memory_used": false
+    }
+  ]
+}
