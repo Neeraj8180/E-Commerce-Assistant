@@ -32,7 +32,7 @@ Switching between environments is one line in `.env`:
 ## Run with Groq (cloud)
 
 **Stack:** `llama-3.3-70b-versatile` via Groq · `nomic-embed-text` via Ollama
-(embeddings) · pgVector memory · everything else identical.
+(embeddings) · pgVector memory ·
 
 ### Eval results — 15-case run (sequential)
 
@@ -105,7 +105,7 @@ Raw report:
 
 **Stack:** `llama3.2` via Ollama · `nomic-embed-text` via Ollama · pgVector memory.
 
-> **Hardware note:** captured on a developer laptop with **no dedicated GPU**.
+> **Hardware note:** captured on my personal laptop with **no dedicated GPU**.
 > Ollama runs `llama3.2` on CPU, so a single chat turn already takes 10–30 s
 > and Ollama queues concurrent requests onto one compute slot. The numbers
 > below reflect that device limitation, not the architecture.
