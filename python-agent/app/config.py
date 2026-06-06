@@ -21,6 +21,11 @@ class Settings(BaseSettings):
     ollama_timeout_seconds: int = Field(default=60, alias="OLLAMA_TIMEOUT_SECONDS")
     embed_dimension: int = Field(default=768, alias="EMBED_DIMENSION")
 
+    groq_api_key: str = Field(default="", alias="GROQ_API_KEY")
+    groq_base_url: str = Field(default="https://api.groq.com/openai/v1", alias="GROQ_BASE_URL")
+    groq_model: str = Field(default="llama-3.3-70b-versatile", alias="GROQ_MODEL")
+    groq_timeout_seconds: int = Field(default=60, alias="GROQ_TIMEOUT_SECONDS")
+
     # DB
     database_url: str = Field(
         default="postgresql://ecom:ecom_pass@localhost:5432/ecom_agent",

@@ -11,6 +11,7 @@ from functools import lru_cache
 
 from app.config import settings
 from app.llm.base import LLMProvider, LLMResponse
+from app.llm.groq import GroqProvider
 from app.llm.ollama import OllamaProvider
 
 
@@ -19,6 +20,8 @@ def get_llm_provider() -> LLMProvider:
     provider = settings.llm_provider.lower()
     if provider == "ollama":
         return OllamaProvider()
+    if provider == "groq":
+        return GroqProvider()
     raise ValueError(f"Unsupported LLM_PROVIDER: {provider}")
 
 

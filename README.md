@@ -26,7 +26,7 @@ Prometheus metrics, and a real authenticated `/chat` response.
 | ![Grafana agent performance](docs/proof/grafana-agent-performance.png) | ![Grafana latency](docs/proof/grafana-latency-failures.png) |
 | **Prometheus metrics** | **Live WISMO chat response** |
 | ![Prometheus metrics](docs/proof/prometheus-metrics.png) | ![Chat demo](docs/proof/chat-demo-wismo.png) |
-| **Eval by scope (returns / exchanges / WISMO)** | **Concurrent load test (5 users)** |
+| **Eval by scope (returns / exchanges / WISMO)** | **Load test — 100 concurrent users (Groq)** |
 | ![Eval by scope](docs/proof/eval-by-scope.png) | ![Load test](docs/proof/load-test.png) |
 | **Automated eval report** | **Eval latency distribution** |
 | ![Eval report](docs/proof/eval-report.png) | ![Eval latency](docs/proof/eval-latency.png) |
@@ -37,19 +37,24 @@ Prometheus metrics, and a real authenticated `/chat` response.
 `make load-test` (100 concurrent users). Capture proof screenshots with
 `make proof`.
 
-### Local test environment (models & latency)
+### Test environments (the system was benchmarked in two configurations)
 
-| Setting | Value |
-|---------|-------|
-| **LLM (chat)** | `llama3.2` via Ollama (`OLLAMA_MODEL`) |
-| **Embeddings** | `nomic-embed-text` — 768-d (`OLLAMA_EMBED_MODEL`) |
-| **Gateway timeout** | 180 s (`PYTHON_AGENT_TIMEOUT_SECONDS`) — local Ollama needs headroom |
+| Configuration | LLM (chat) | Embeddings | Hardware |
+|---|---|---|---|
+| **Local (Ollama)** | `llama3.2` via Ollama | `nomic-embed-text` (768-d) via Ollama | Developer laptop, **CPU-only, no GPU** |
+| **Cloud (Groq)** | `llama-3.3-70b-versatile` via Groq | `nomic-embed-text` via Ollama | Groq hosted inference + local laptop for everything else |
 
-> **Latency note:** Eval scores include a latency band (&lt;1 s = full credit).
-> On a laptop with local Ollama, turns typically take **10–30 s**, so many cases
-> show `slow_latency` failures even when intent, tools, and outcomes are correct.
-> Quality metrics (intent accuracy, task success, grounding) are the meaningful
-> signals locally; latency improves with a hosted GPU model (vLLM, Bedrock, etc.).
+> **Why two environments?** The local run is the honest, low-resource baseline
+> any reviewer can reproduce. The Groq run shows the same code, the same
+> agents, and the same memory pipeline performing at production-grade latency
+> when the LLM bottleneck is removed. The `LLMProvider` interface
+> ([python-agent/app/llm/base.py](python-agent/app/llm/base.py)) makes the
+> swap a single `.env` change (`LLM_PROVIDER=ollama` or `groq`).
+
+> **Local hardware note:** The local results below were captured on a laptop
+> with **no dedicated GPU** — Ollama runs `llama3.2` on CPU, so a single chat
+> turn already takes 10–30 s and Ollama queues concurrent requests onto one
+> compute slot. This is a device limitation, not an architecture limitation.
 
 ### Eval results (45-case standard run, local Ollama)
 
@@ -67,17 +72,30 @@ grounding — not broken routing.
 
 ### Concurrent load test (real measurements)
 
+**Cloud — Groq (`llama-3.3-70b-versatile`), 100 concurrent users, shuffled mixed queries (26 returns + 30 exchanges + 44 WISMO):**
+
+| Concurrency | Total | Success | p50 | p95 | p99 | Throughput | Result |
+|------------:|------:|--------:|----:|----:|----:|-----------:|--------|
+| **100**     |   100 |  **100%** | 9.0 s | 10.3 s | 10.3 s | **9.65 req/s** | Clean run — all 3 query types in parallel, zero errors |
+
+**Local — Ollama (`llama3.2`, CPU-only laptop, no GPU):**
+
 | Concurrency | Total | Success | p50 | p95 | Throughput | Notes |
 |------------:|------:|--------:|----:|----:|-----------:|-------|
-| **5**       |    30 |   **80%** | 110 s | 179 s | 0.04 req/s | Realistic local baseline — bottleneck is Ollama, not the gateway |
+| **5**       |    30 |   **80%** | 110 s | 179 s | 0.04 req/s | Realistic local baseline — bottleneck is Ollama on CPU, not the gateway |
 | **100**     |   100 |     4%  |  81 s |  82 s | 0.55 req/s | Stress test — circuit breaker fires, gateway protects the agent |
 
-Each `/chat` turn runs **3 Ollama calls** locally (router prompt + Q&A generate +
-2 embeddings for memory search & index), so a single CPU/GPU Ollama instance
-is the limiting factor. The Go gateway, circuit breaker, retries, validation,
-and pgVector memory all behave correctly at high concurrency. In production
-the LLM is swapped for a hosted model (OpenAI, Bedrock, vLLM) and the Python
-agent scales horizontally — throughput then scales linearly with replicas.
+Each `/chat` turn runs **3 LLM hops** (router prompt + Q&A generate + 2
+embedding calls for memory search & index). With local CPU-only Ollama, that
+single compute slot is the limiting factor. With Groq handling chat
+completions, latency drops ~10x and the system sustains **9.65 req/s with
+100% success at 100-way parallel** — the same code, agents, validation,
+circuit breaker, and pgVector memory pipeline.
+
+The Go gateway, circuit breaker, retries, validation, and pgVector memory
+all behave identically in both runs. In production, swap `LLMProvider` for a
+hosted model (Groq, OpenAI, Bedrock, vLLM) and scale the Python agent
+horizontally — throughput then scales linearly with replicas.
 
 ---
 

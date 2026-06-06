@@ -15,6 +15,7 @@ import argparse
 import asyncio
 import json
 import os
+import random
 import sys
 import time
 import uuid
@@ -161,6 +162,8 @@ async def main() -> int:
     ap.add_argument("--concurrency", type=int, default=100, help="Parallel in-flight requests")
     ap.add_argument("--limit", type=int, default=100, help="Number of cases to fire (capped by dataset size)")
     ap.add_argument("--timeout", type=float, default=180.0, help="Per-request HTTP timeout (seconds)")
+    ap.add_argument("--seed", type=int, default=42, help="Shuffle seed for mixing query types")
+    ap.add_argument("--no-shuffle", action="store_true", help="Disable shuffling (run dataset in order)")
     ap.add_argument("--output-dir", default=str(ROOT / "evaluation" / "reports"))
     args = ap.parse_args()
 
@@ -168,10 +171,19 @@ async def main() -> int:
         print("ERROR: API_KEY env var is required", file=sys.stderr)
         return 1
 
-    cases = load_dataset(args.dataset)[: args.limit]
+    cases = load_dataset(args.dataset)
+    if args.dataset == "all" and not args.no_shuffle:
+        random.Random(args.seed).shuffle(cases)
+    cases = cases[: args.limit]
     if not cases:
         print("ERROR: no cases loaded", file=sys.stderr)
         return 1
+
+    type_counts: dict[str, int] = {}
+    for c in cases:
+        prefix = c["id"].split("-", 1)[0]
+        type_counts[prefix] = type_counts.get(prefix, 0) + 1
+    print(f"Query type mix: {type_counts}")
 
     concurrency = max(1, min(args.concurrency, len(cases)))
     print(f"Load test: {len(cases)} requests, concurrency={concurrency}, target={GO_SERVER_URL}")
