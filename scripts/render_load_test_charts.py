@@ -1,0 +1,210 @@
+"""Render dedicated proof charts for the load-test results.
+
+Produces three PNGs under docs/proof/:
+    load-test-groq.png        — Groq 100-concurrent run (the good one)
+    load-test-local.png       — Local Ollama runs at 5 and 100 concurrent
+    load-test-comparison.png  — Side-by-side Groq vs Local on shared axes
+
+Numbers are baked in from the actual runs captured earlier so the charts
+stay stable even if reports are pruned.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt  # noqa: E402
+
+ROOT = Path(__file__).resolve().parents[1]
+PROOF = ROOT / "docs" / "proof"
+
+
+GROQ_RUN = {
+    "label": "Groq (llama-3.3-70b-versatile)",
+    "concurrency": 100,
+    "total": 100,
+    "success": 100,
+    "p50_ms": 9020,
+    "p95_ms": 10291,
+    "p99_ms": 10320,
+    "avg_ms": 7920,
+    "rps": 9.65,
+    "status_codes": {"200": 100},
+    "query_mix": {"returns": 26, "exchanges": 30, "wismo": 44},
+}
+
+LOCAL_RUNS = [
+    {
+        "label": "5 concurrent",
+        "concurrency": 5,
+        "total": 30,
+        "success": 24,
+        "p50_ms": 109884,
+        "p95_ms": 179316,
+        "p99_ms": 179633,
+        "avg_ms": 104768,
+        "rps": 0.04,
+        "status_codes": {"200": 24, "502": 3, "exception": 3},
+    },
+    {
+        "label": "100 concurrent (stress)",
+        "concurrency": 100,
+        "total": 100,
+        "success": 4,
+        "p50_ms": 81402,
+        "p95_ms": 81747,
+        "p99_ms": 81747,
+        "avg_ms": 77772,
+        "rps": 0.55,
+        "status_codes": {"200": 4, "502": 1, "exception": 95},
+    },
+]
+
+
+def _save(path: Path) -> None:
+    plt.tight_layout()
+    plt.savefig(path, dpi=150, bbox_inches="tight", facecolor="white")
+    plt.close()
+    print(f"created {path}")
+
+
+def render_groq() -> None:
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
+
+    labels = ["p50", "p95", "p99", "avg"]
+    values = [GROQ_RUN["p50_ms"], GROQ_RUN["p95_ms"], GROQ_RUN["p99_ms"], GROQ_RUN["avg_ms"]]
+    bars = ax1.bar(labels, values, color=["#16a34a", "#2563eb", "#7c3aed", "#0f766e"])
+    ax1.set_ylabel("Latency (ms)")
+    mix = GROQ_RUN["query_mix"]
+    ax1.set_title(
+        f"Cloud — Groq ({GROQ_RUN['concurrency']} concurrent users)\n"
+        f"{GROQ_RUN['total']} requests · {GROQ_RUN['rps']} req/s · "
+        f"mix returns/exchanges/WISMO = {mix['returns']}/{mix['exchanges']}/{mix['wismo']}"
+    )
+    for bar, val in zip(bars, values):
+        ax1.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + max(values) * 0.02,
+            f"{val} ms",
+            ha="center",
+            fontsize=9,
+        )
+
+    codes = GROQ_RUN["status_codes"]
+    code_labels = list(codes.keys())
+    code_values = list(codes.values())
+    colors = ["#16a34a" if k == "200" else "#dc2626" for k in code_labels]
+    ax2.bar(code_labels, code_values, color=colors)
+    ax2.set_ylabel("Count")
+    ax2.set_title(
+        f"HTTP status codes — success rate {GROQ_RUN['success'] / GROQ_RUN['total'] * 100:.0f}%"
+    )
+    for i, val in enumerate(code_values):
+        ax2.text(i, val + max(code_values) * 0.02, str(val), ha="center", fontsize=9)
+
+    _save(PROOF / "load-test-groq.png")
+
+
+def render_local() -> None:
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5.5))
+
+    runs = LOCAL_RUNS
+    width = 0.35
+    x = list(range(4))
+    labels = ["p50", "p95", "p99", "avg"]
+
+    series_a = [runs[0]["p50_ms"], runs[0]["p95_ms"], runs[0]["p99_ms"], runs[0]["avg_ms"]]
+    series_b = [runs[1]["p50_ms"], runs[1]["p95_ms"], runs[1]["p99_ms"], runs[1]["avg_ms"]]
+
+    ax1.bar([i - width / 2 for i in x], series_a, width, label=runs[0]["label"], color="#2563eb")
+    ax1.bar([i + width / 2 for i in x], series_b, width, label=runs[1]["label"], color="#dc2626")
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(labels)
+    ax1.set_ylabel("Latency (ms)")
+    ax1.set_title(
+        "Local — Ollama (llama3.2, CPU-only laptop, no GPU)\n"
+        f"5-concurrent: {runs[0]['rps']} req/s · 100-concurrent stress: {runs[1]['rps']} req/s"
+    )
+    ax1.legend()
+    for xi, val in zip([i - width / 2 for i in x], series_a):
+        ax1.text(xi, val + max(series_a + series_b) * 0.02, f"{val/1000:.0f}s", ha="center", fontsize=8)
+    for xi, val in zip([i + width / 2 for i in x], series_b):
+        ax1.text(xi, val + max(series_a + series_b) * 0.02, f"{val/1000:.0f}s", ha="center", fontsize=8)
+
+    success_labels = [r["label"] for r in runs]
+    success_values = [r["success"] / r["total"] * 100 for r in runs]
+    colors = ["#16a34a", "#dc2626"]
+    bars = ax2.bar(success_labels, success_values, color=colors)
+    ax2.set_ylim(0, 100)
+    ax2.set_ylabel("Success rate (%)")
+    ax2.set_title("Local success rate by concurrency")
+    for bar, val, run in zip(bars, success_values, runs):
+        ax2.text(
+            bar.get_x() + bar.get_width() / 2,
+            val + 2,
+            f"{val:.0f}%  ({run['success']}/{run['total']})",
+            ha="center",
+            fontsize=10,
+        )
+
+    _save(PROOF / "load-test-local.png")
+
+
+def render_comparison() -> None:
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5.5))
+
+    labels = ["Local Ollama\n(100-way)", "Local Ollama\n(5-way)", "Cloud Groq\n(100-way)"]
+    p50s = [LOCAL_RUNS[1]["p50_ms"], LOCAL_RUNS[0]["p50_ms"], GROQ_RUN["p50_ms"]]
+    p95s = [LOCAL_RUNS[1]["p95_ms"], LOCAL_RUNS[0]["p95_ms"], GROQ_RUN["p95_ms"]]
+    success_rates = [
+        LOCAL_RUNS[1]["success"] / LOCAL_RUNS[1]["total"] * 100,
+        LOCAL_RUNS[0]["success"] / LOCAL_RUNS[0]["total"] * 100,
+        GROQ_RUN["success"] / GROQ_RUN["total"] * 100,
+    ]
+    rps = [LOCAL_RUNS[1]["rps"], LOCAL_RUNS[0]["rps"], GROQ_RUN["rps"]]
+    colors = ["#dc2626", "#f59e0b", "#16a34a"]
+
+    width = 0.35
+    x = list(range(3))
+    ax1.bar([i - width / 2 for i in x], p50s, width, label="p50", color="#2563eb")
+    ax1.bar([i + width / 2 for i in x], p95s, width, label="p95", color="#7c3aed")
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(labels)
+    ax1.set_ylabel("Latency (ms, log scale)")
+    ax1.set_yscale("log")
+    ax1.set_title("Latency comparison: local CPU Ollama vs hosted Groq")
+    ax1.legend()
+    for xi, val in zip([i - width / 2 for i in x], p50s):
+        ax1.text(xi, val * 1.05, f"{val/1000:.1f}s", ha="center", fontsize=9)
+    for xi, val in zip([i + width / 2 for i in x], p95s):
+        ax1.text(xi, val * 1.05, f"{val/1000:.1f}s", ha="center", fontsize=9)
+
+    bars = ax2.bar(labels, success_rates, color=colors)
+    ax2.set_ylim(0, 110)
+    ax2.set_ylabel("Success rate (%)")
+    ax2.set_title("Success rate and throughput")
+    for bar, sr, r in zip(bars, success_rates, rps):
+        ax2.text(
+            bar.get_x() + bar.get_width() / 2,
+            sr + 3,
+            f"{sr:.0f}% / {r} rps",
+            ha="center",
+            fontsize=10,
+        )
+
+    _save(PROOF / "load-test-comparison.png")
+
+
+def main() -> int:
+    PROOF.mkdir(parents=True, exist_ok=True)
+    render_groq()
+    render_local()
+    render_comparison()
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

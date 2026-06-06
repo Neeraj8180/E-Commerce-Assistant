@@ -26,10 +26,12 @@ Prometheus metrics, and a real authenticated `/chat` response.
 | ![Grafana agent performance](docs/proof/grafana-agent-performance.png) | ![Grafana latency](docs/proof/grafana-latency-failures.png) |
 | **Prometheus metrics** | **Live WISMO chat response** |
 | ![Prometheus metrics](docs/proof/prometheus-metrics.png) | ![Chat demo](docs/proof/chat-demo-wismo.png) |
-| **Eval by scope (returns / exchanges / WISMO)** | **Load test — 100 concurrent users (Groq)** |
-| ![Eval by scope](docs/proof/eval-by-scope.png) | ![Load test](docs/proof/load-test.png) |
-| **Automated eval report** | **Eval latency distribution** |
-| ![Eval report](docs/proof/eval-report.png) | ![Eval latency](docs/proof/eval-latency.png) |
+| **Eval by scope (returns / exchanges / WISMO)** | **Automated eval report** |
+| ![Eval by scope](docs/proof/eval-by-scope.png) | ![Eval report](docs/proof/eval-report.png) |
+| **Eval latency distribution** | **Cloud load test — Groq, 100 concurrent users** |
+| ![Eval latency](docs/proof/eval-latency.png) | ![Groq load test](docs/proof/load-test-groq.png) |
+| **Local load test — Ollama (CPU-only, no GPU)** | **Comparison — Groq vs local Ollama** |
+| ![Local load test](docs/proof/load-test-local.png) | ![Load test comparison](docs/proof/load-test-comparison.png) |
 
 **Dataset scale:** **100 synthetic cases per agent scope** (300 total in
 `evaluation/dataset/`). Standard local eval runs **15 per scope (45 cases)** via
