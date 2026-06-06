@@ -1,5 +1,0 @@
-docs: split load-test metrics into Groq and local sections
-
-Drop the Groq-vs-local comparison chart and reorganize the README so
-Groq numbers stand alone at the top and local Ollama numbers follow in
-their own section. Update render_load_test_charts.py to match.
