@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"strconv"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -45,12 +47,26 @@ type AgentClient struct {
 
 // NewAgentClient constructs a client with sensible defaults.
 func NewAgentClient(baseURL string, timeout time.Duration) *AgentClient {
+	threshold := getEnvInt("AGENT_BREAKER_FAIL_THRESHOLD", 5)
+	cooldown := time.Duration(getEnvInt("AGENT_BREAKER_COOLDOWN_SECONDS", 20)) * time.Second
 	return &AgentClient{
 		baseURL:       baseURL,
 		http:          &http.Client{Timeout: timeout},
-		failThreshold: 5,
-		openCooldown:  20 * time.Second,
+		failThreshold: threshold,
+		openCooldown:  cooldown,
 	}
+}
+
+func getEnvInt(key string, def int) int {
+	v := os.Getenv(key)
+	if v == "" {
+		return def
+	}
+	n, err := strconv.Atoi(v)
+	if err != nil || n <= 0 {
+		return def
+	}
+	return n
 }
 
 // ProcessQuery forwards a chat message to the Python agent.

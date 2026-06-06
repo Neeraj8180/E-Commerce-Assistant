@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     # Agent behavior
     rag_top_k: int = Field(default=5, alias="RAG_TOP_K")
     rag_score_threshold: float = Field(default=0.5, alias="RAG_SCORE_THRESHOLD")
+    memory_session_top_k: int = Field(default=3, alias="MEMORY_SESSION_TOP_K")
+    memory_user_top_k: int = Field(default=3, alias="MEMORY_USER_TOP_K")
+    memory_score_threshold: float = Field(default=0.40, alias="MEMORY_SCORE_THRESHOLD")
     refund_auto_approve_limit: float = Field(default=50.0, alias="REFUND_AUTO_APPROVE_LIMIT")
     return_window_days: int = Field(default=30, alias="RETURN_WINDOW_DAYS")
     max_failures_before_escalation: int = Field(default=3, alias="MAX_FAILURES_BEFORE_ESCALATION")

@@ -2,6 +2,7 @@
 
 Usage (inside the python-agent container with the stack running):
     docker compose run --rm python-agent python -m evaluation.runner --dataset all
+    docker compose run --rm python-agent python -m evaluation.runner --dataset all --per-scope-limit 15
     docker compose run --rm python-agent python -m evaluation.runner --dataset returns --limit 5
 """
 
@@ -126,12 +127,24 @@ async def main() -> int:
     ap = argparse.ArgumentParser(description="Run evaluation against the running e-commerce agent system.")
     ap.add_argument("--dataset", choices=["returns", "exchanges", "wismo", "all"], default="all")
     ap.add_argument("--limit", type=int, default=0, help="Only run the first N cases (0 = all)")
+    ap.add_argument(
+        "--per-scope-limit",
+        type=int,
+        default=0,
+        help="When --dataset all, run the first N cases from each scope (returns, exchanges, WISMO)",
+    )
     ap.add_argument("--output-dir", default=str(ROOT / "evaluation" / "reports"))
     args = ap.parse_args()
 
-    cases = load_dataset(args.dataset)
-    if args.limit > 0:
-        cases = cases[: args.limit]
+    if args.dataset == "all" and args.per_scope_limit > 0:
+        cases: list[dict[str, Any]] = []
+        for name in DATASETS:
+            scope_cases = load_dataset(name)[: args.per_scope_limit]
+            cases.extend(scope_cases)
+    else:
+        cases = load_dataset(args.dataset)
+        if args.limit > 0:
+            cases = cases[: args.limit]
     print(f"Running {len(cases)} cases against {GO_SERVER_URL}")
 
     await init_pool()
@@ -139,8 +152,10 @@ async def main() -> int:
     failures: list[dict[str, Any]] = []
 
     try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            for case in cases:
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            for i, case in enumerate(cases):
+                if i > 0:
+                    await asyncio.sleep(0.5)
                 try:
                     actual, latency_ms = await run_case(client, case)
                 except Exception as exc:  # noqa: BLE001

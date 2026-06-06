@@ -12,6 +12,7 @@ from typing import Any
 
 from app.llm import get_llm_provider
 from app.observability import AGENT_LATENCY, AGENT_SUCCESS, LLM_TOKENS, get_logger
+from app.memory import MemoryChunk, format_memory_for_prompt
 from app.tools.policy_rag import RetrievedChunk, format_chunks_for_prompt
 from app.validation import MAX_REPLY_CHARS, sanitize_text
 
@@ -39,10 +40,13 @@ class QAAgent:
         user_message: str,
         context: dict[str, Any],
         policy_chunks: list[RetrievedChunk] | None = None,
+        memory_chunks: list[MemoryChunk] | None = None,
     ) -> str:
         start = time.perf_counter()
         try:
-            prompt = self._build_prompt(intent, user_message, context, policy_chunks or [])
+            prompt = self._build_prompt(
+                intent, user_message, context, policy_chunks or [], memory_chunks or []
+            )
             llm = get_llm_provider()
             resp = await llm.complete(prompt, system=_SYSTEM_PROMPT, temperature=0.3, max_tokens=300)
             LLM_TOKENS.labels(model=resp.model, kind="prompt").inc(resp.prompt_tokens)
@@ -61,10 +65,14 @@ class QAAgent:
         user_message: str,
         context: dict[str, Any],
         policy_chunks: list[RetrievedChunk],
+        memory_chunks: list[MemoryChunk],
     ) -> str:
         ctx_lines = ["CONTEXT (use only these facts):"]
         for k, v in context.items():
             ctx_lines.append(f"- {k}: {v}")
+        ctx_lines.append("")
+        ctx_lines.append("CONVERSATION MEMORY (prior turns — use for continuity, not as policy facts):")
+        ctx_lines.append(format_memory_for_prompt(memory_chunks))
         ctx_lines.append("")
         ctx_lines.append("RELEVANT POLICIES / FAQ:")
         ctx_lines.append(format_chunks_for_prompt(policy_chunks))

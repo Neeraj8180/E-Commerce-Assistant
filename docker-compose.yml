@@ -16,8 +16,11 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./db/migrations:/docker-entrypoint-initdb.d/01-migrations:ro
-      - ./db/seed:/docker-entrypoint-initdb.d/02-seed:ro
+      - ./db/migrations/001_init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+      - ./db/migrations/002_pgvector.sql:/docker-entrypoint-initdb.d/02_pgvector.sql:ro
+      - ./db/migrations/003_inventory_auth_mocks.sql:/docker-entrypoint-initdb.d/03_inventory.sql:ro
+      - ./db/migrations/004_memory_embeddings.sql:/docker-entrypoint-initdb.d/04_memory.sql:ro
+      - ./db/seed/seed.sql:/docker-entrypoint-initdb.d/05_seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ecom} -d ${POSTGRES_DB:-ecom_agent}"]
       interval: 5s

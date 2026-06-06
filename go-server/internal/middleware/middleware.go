@@ -157,9 +157,14 @@ func (s *rateLimiterStore) get(key string) *rate.Limiter {
 }
 
 // RateLimit enforces a per-identity token bucket.
+// Service API-key traffic (eval harness, internal jobs) is exempt.
 func RateLimit(rps float64, burst int) gin.HandlerFunc {
 	store := newStore(rps, burst)
 	return func(c *gin.Context) {
+		if c.GetString(ctxUserRole) == "service" {
+			c.Next()
+			return
+		}
 		key := c.GetString(ctxUserID)
 		if key == "" {
 			key = c.ClientIP()

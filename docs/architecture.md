@@ -105,7 +105,8 @@ flowchart LR
         Orders[(orders)]
         Returns[(returns)]
         Conversations[(conversations)]
-        Embeddings[("embeddings\nvector(768)")]
+        Embeddings[("embeddings\nvector(768)\n(policy/FAQ RAG)")]
+        Memory[("memory_embeddings\nvector(768)\n(session + user memory)")]
         EvalRuns[(eval_runs)]
     end
 
@@ -113,8 +114,10 @@ flowchart LR
     PythonAgent --> Returns
     PythonAgent --> Conversations
     PythonAgent --> Embeddings
+    PythonAgent --> Memory
     Eval[Evaluation Runner] --> EvalRuns
     Eval --> GoAPI[Go API /chat]
+    Load[Load Test] --> GoAPI
     Ingest[db/ingest.py] --> Embeddings
 ```
 
@@ -123,6 +126,7 @@ flowchart LR
 * **Go (Gin)** — predictable tail latency, easy deployments, single binary.
 * **Python (FastAPI)** — best LLM/ML ecosystem and fast iteration on agents.
 * **pgVector** — one database for relational + vector; ACID; cheap to operate.
+  Used for both policy/FAQ RAG and per-user / per-session conversation memory.
 * **Kafka** — durable event log for audit/replay; ready for downstream
   consumers (CRM, analytics) without rework.
 * **Ollama** — local, free, swappable. Production deployments can switch the
@@ -141,7 +145,6 @@ make down-clean   # nuke volumes
 ## 7. Open extensions (future work)
 
 * Streaming responses (SSE) from Go → Python → LLM.
-* User memory store (recent purchases, preferences) injected into Q&A prompt.
 * Multi-tenant RBAC at the Go layer.
 * Online evaluation: sample 1% of live traffic into an evaluation queue.
 * Swap Ollama for vLLM behind the same `LLMProvider` interface.

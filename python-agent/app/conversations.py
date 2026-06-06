@@ -33,7 +33,7 @@ async def upsert_conversation(
         messages = messages[-MAX_MESSAGES_PER_CONVERSATION:]
     pool = get_pool()
     async with pool.acquire() as conn:
-        uid = await _resolve_user_uuid(conn, user_id)
+        uid = await resolve_user_id(conn, user_id)
         await conn.execute(
             """
             INSERT INTO conversations (session_id, user_id, intent, outcome, messages, metadata, escalated)
@@ -57,7 +57,7 @@ async def upsert_conversation(
         )
 
 
-async def _resolve_user_uuid(conn, user_id: str | None) -> str | None:
+async def resolve_user_id(conn, user_id: str | None) -> str | None:
     if not user_id:
         return None
     # If already a UUID, accept it.

@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-06-06 14:14:25 UTC",
+  "files": [
+    "architecture-proof.png",
+    "eval-summary.png",
+    "eval-by-scope.png",
+    "eval-latency.png",
+    "prometheus-metrics.png",
+    "load-test.png",
+    "chat-demo-wismo.png",
+    "grafana-agent-performance.png",
+    "grafana-latency-failures.png",
+    "prometheus-ui.png",
+    "eval-report.png"
+  ]
+}

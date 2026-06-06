@@ -67,9 +67,12 @@ def _rule_classify(message: str) -> RouterResult | None:
     return None
 
 
-async def _llm_classify(message: str) -> RouterResult:
+async def _llm_classify(message: str, recent_context: str = "") -> RouterResult:
     llm = get_llm_provider()
-    prompt = f"User message: {message!r}\nClassify and respond with JSON only."
+    context_block = ""
+    if recent_context.strip():
+        context_block = f"Recent conversation:\n{recent_context}\n\n"
+    prompt = f"{context_block}User message: {message!r}\nClassify and respond with JSON only."
     resp = await llm.complete(prompt, system=_SYSTEM_PROMPT, temperature=0.0, json_mode=True)
     LLM_TOKENS.labels(model=resp.model, kind="prompt").inc(resp.prompt_tokens)
     LLM_TOKENS.labels(model=resp.model, kind="completion").inc(resp.completion_tokens)
@@ -96,11 +99,11 @@ async def _llm_classify(message: str) -> RouterResult:
 class RouterAgent:
     name = "router"
 
-    async def classify(self, message: str) -> RouterResult:
+    async def classify(self, message: str, recent_context: str = "") -> RouterResult:
         start = time.perf_counter()
         result = _rule_classify(message)
         if result is None:
-            result = await _llm_classify(message)
+            result = await _llm_classify(message, recent_context=recent_context)
         AGENT_LATENCY.labels(agent_name=self.name, intent=result.intent).observe(time.perf_counter() - start)
         AGENT_SUCCESS.labels(agent_name=self.name, intent=result.intent).inc()
         log.info(

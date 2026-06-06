@@ -57,6 +57,7 @@ restart: ## Restart application services
 migrate: ## Apply database migrations
 	docker compose exec -T postgres psql -U $$POSTGRES_USER -d $$POSTGRES_DB < db/migrations/001_init.sql
 	docker compose exec -T postgres psql -U $$POSTGRES_USER -d $$POSTGRES_DB < db/migrations/002_pgvector.sql
+	docker compose exec -T postgres psql -U $$POSTGRES_USER -d $$POSTGRES_DB < db/migrations/004_memory_embeddings.sql
 
 seed: ## Load sample orders, users, returns
 	docker compose exec -T postgres psql -U $$POSTGRES_USER -d $$POSTGRES_DB < db/seed/seed.sql
@@ -82,11 +83,23 @@ py-run: ## Run Python agent service locally
 # =============================================================================
 # Evaluation
 # =============================================================================
-eval: ## Run full evaluation harness against running stack
+datasets: ## Generate 100 eval cases per scope (returns, exchanges, WISMO)
+	python evaluation/generate_datasets.py
+
+eval: ## Run full evaluation harness (300 cases) against running stack
 	docker compose run --rm python-agent python -m evaluation.runner --dataset all
+
+eval-standard: ## Standard eval — 15 cases per scope (45 total, recommended for local Ollama)
+	docker compose run --rm python-agent python -m evaluation.runner --dataset all --per-scope-limit 15
 
 eval-quick: ## Quick smoke eval (5 queries per category)
 	docker compose run --rm python-agent python -m evaluation.runner --dataset all --limit 5
+
+load-test: ## Concurrent load test (100 parallel users by default)
+	docker compose run --rm python-agent python -m evaluation.load_test --concurrency 100 --limit 100
+
+proof: ## Capture metrics/dashboard screenshots into docs/proof/
+	python scripts/capture_proof.py
 
 replay: ## Replay a stored conversation (usage: make replay SESSION=<session_id>)
 	docker compose run --rm python-agent python -m evaluation.replay --session-id $(SESSION)

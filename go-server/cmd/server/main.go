@@ -73,7 +73,9 @@ func main() {
 
 	metrics := observability.NewMetrics()
 	agent := client.NewAgentClient(cfg.PythonAgentURL, cfg.PythonAgentTimeout)
-	deps := &handlers.Deps{Agent: agent, DB: dbPool, Logger: logger}
+	deps := &handlers.Deps{
+		Agent: agent, DB: dbPool, Logger: logger, AgentTimeout: cfg.PythonAgentTimeout,
+	}
 
 	if cfg.Environment == "production" {
 		gin.SetMode(gin.ReleaseMode)

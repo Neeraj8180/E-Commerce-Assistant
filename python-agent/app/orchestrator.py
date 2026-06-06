@@ -15,6 +15,7 @@ from app.agents.return_planner import ReturnPlannerAgent
 from app.agents.router import RouterAgent
 from app.config import settings
 from app.conversations import append_message, load_conversation, upsert_conversation
+from app.memory import format_recent_messages, index_turn, search_memory
 from app.guardrails import (
     check_grounding,
     extract_order_id,
@@ -98,8 +99,11 @@ class Orchestrator:
 
         append_message(messages, "user", message)
 
+        prior_messages = messages[:-1]
+        recent_context = format_recent_messages(prior_messages)
+
         try:
-            router_result = await self.router.classify(message)
+            router_result = await self.router.classify(message, recent_context=recent_context)
             intent = router_result.intent
         except Exception as exc:  # noqa: BLE001
             AGENT_FAILURE.labels(agent_name="router", reason="exception").inc()
@@ -132,9 +136,13 @@ class Orchestrator:
         known_refund_amounts: list[float] = []
         qa_context: dict[str, Any] = {}
         rag_chunks: list[policy_rag.RetrievedChunk] = []
+        memory_chunks: list[Any] = []
         reply: str | None = None
 
         try:
+            memory_chunks = await search_memory(message, user_id=user_id, session_id=session_id)
+            if memory_chunks:
+                tools_used.append("search_memory")
             if intent == "order_status":
                 order_id = extract_order_id(message, context)
                 if order_id:
@@ -243,6 +251,7 @@ class Orchestrator:
                 user_message=message,
                 context=qa_context,
                 policy_chunks=rag_chunks,
+                memory_chunks=memory_chunks,
             )
 
             # Hallucination check
@@ -278,6 +287,10 @@ class Orchestrator:
             "chunks": policy_rag.chunks_to_metadata(rag_chunks),
             "count": len(rag_chunks),
         }
+        metadata["memory"] = {
+            "chunks": [c.to_dict() for c in memory_chunks],
+            "count": len(memory_chunks),
+        }
         if escalated:
             metadata["escalation_reason"] = esc_reason
 
@@ -292,6 +305,20 @@ class Orchestrator:
             metadata=metadata,
             escalated=escalated,
         )
+
+        turn_index = sum(1 for m in messages if m.get("role") == "assistant")
+        try:
+            await index_turn(
+                user_id=user_id,
+                session_id=session_id,
+                user_message=message,
+                assistant_reply=reply or "",
+                intent=intent,
+                outcome=outcome,
+                turn_index=turn_index,
+            )
+        except Exception as exc:  # noqa: BLE001
+            log.warning("memory_index_failed", error=str(exc), **log_ctx)
 
         await self._publish(session_id=session_id, user_id=user_id, intent=intent, outcome=outcome,
                             escalated=escalated, tools_used=tools_used, metadata=metadata)

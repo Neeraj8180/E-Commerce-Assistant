@@ -19,9 +19,10 @@ import (
 )
 
 type Deps struct {
-	Agent  *client.AgentClient
-	DB     *pgxpool.Pool
-	Logger *slog.Logger
+	Agent        *client.AgentClient
+	DB           *pgxpool.Pool
+	Logger       *slog.Logger
+	AgentTimeout time.Duration
 }
 
 // Chat is the main user-facing endpoint. The user identity is taken from
@@ -67,7 +68,11 @@ func Chat(d *Deps) gin.HandlerFunc {
 			RequestID: rid,
 		}
 
-		ctx, cancel := context.WithTimeout(c.Request.Context(), 30*time.Second)
+		timeout := d.AgentTimeout
+		if timeout <= 0 {
+			timeout = 30 * time.Second
+		}
+		ctx, cancel := context.WithTimeout(c.Request.Context(), timeout)
 		defer cancel()
 
 		agentResp, err := d.Agent.ProcessQuery(ctx, agentReq)
@@ -107,7 +112,11 @@ func Replay(d *Deps) gin.HandlerFunc {
 			})
 			return
 		}
-		ctx, cancel := context.WithTimeout(c.Request.Context(), 30*time.Second)
+		timeout := d.AgentTimeout
+		if timeout <= 0 {
+			timeout = 30 * time.Second
+		}
+		ctx, cancel := context.WithTimeout(c.Request.Context(), timeout)
 		defer cancel()
 		resp, err := d.Agent.Replay(ctx, req.SessionID)
 		if err != nil {
