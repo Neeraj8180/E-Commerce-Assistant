@@ -1,0 +1,50 @@
+# Environment / secrets
+.env
+.env.local
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Go
+go-server/bin/
+go-server/tmp/
+*.exe
+*.test
+*.out
+vendor/
+
+# Node (in case of future UI)
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Logs / reports
+logs/
+*.log
+evaluation/reports/*.json
+evaluation/reports/*.html
+!evaluation/reports/.gitkeep
+
+# Docker volumes (local override)
+postgres_data/
+grafana_data/
+prometheus_data/
+kafka_data/

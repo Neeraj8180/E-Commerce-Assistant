@@ -1,0 +1,31 @@
+# Web framework
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+pydantic==2.7.1
+pydantic-settings==2.3.4
+
+# DB / vector
+asyncpg==0.29.0
+pgvector==0.3.0
+
+# HTTP / LLM
+httpx==0.27.0
+tenacity==8.3.0
+
+# Messaging
+aiokafka==0.10.0
+
+# Observability
+structlog==24.1.0
+prometheus-client==0.20.0
+opentelemetry-api==1.25.0
+opentelemetry-sdk==1.25.0
+opentelemetry-exporter-otlp==1.25.0
+opentelemetry-instrumentation-fastapi==0.46b0
+opentelemetry-instrumentation-httpx==0.46b0
+opentelemetry-instrumentation-asyncpg==0.46b0
+
+# Eval / misc
+pytest==8.2.2
+pytest-asyncio==0.23.7
+python-json-logger==2.0.7

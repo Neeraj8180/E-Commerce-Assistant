@@ -1,0 +1,224 @@
+name: ecom-agent
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL with pgVector extension
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: ecom-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ecom}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ecom_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-ecom_agent}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/migrations:/docker-entrypoint-initdb.d/01-migrations:ro
+      - ./db/seed:/docker-entrypoint-initdb.d/02-seed:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ecom} -d ${POSTGRES_DB:-ecom_agent}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - ecom-net
+
+  # ---------------------------------------------------------------------------
+  # Kafka (KRaft mode - no Zookeeper)
+  # ---------------------------------------------------------------------------
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: ecom-kafka
+    restart: unless-stopped
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,EXTERNAL://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      CLUSTER_ID: "MkU3OEVBNTcwNTJFNDM5Mg"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    networks:
+      - ecom-net
+
+  # ---------------------------------------------------------------------------
+  # Mock external APIs (Shopify, Stripe)
+  # ---------------------------------------------------------------------------
+  shopify-mock:
+    build:
+      context: ./mocks/shopify
+      dockerfile: Dockerfile
+    container_name: ecom-shopify-mock
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-ecom}:${POSTGRES_PASSWORD:-ecom_pass}@postgres:5432/${POSTGRES_DB:-ecom_agent}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ecom-net
+
+  stripe-mock:
+    build:
+      context: ./mocks/stripe
+      dockerfile: Dockerfile
+    container_name: ecom-stripe-mock
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-ecom}:${POSTGRES_PASSWORD:-ecom_pass}@postgres:5432/${POSTGRES_DB:-ecom_agent}
+      REFUND_AUTO_APPROVE_LIMIT: "${REFUND_AUTO_APPROVE_LIMIT:-50.0}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ecom-net
+
+  # ---------------------------------------------------------------------------
+  # Python Agent Service
+  # ---------------------------------------------------------------------------
+  python-agent:
+    build:
+      context: ./python-agent
+      dockerfile: Dockerfile
+    container_name: ecom-python-agent
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-ecom}:${POSTGRES_PASSWORD:-ecom_pass}@postgres:5432/${POSTGRES_DB:-ecom_agent}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_SERVICE_NAME: python-agent
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      shopify-mock:
+        condition: service_started
+      stripe-mock:
+        condition: service_started
+    volumes:
+      - ./python-agent:/app
+      - ./db:/app/db
+      - ./evaluation:/app/evaluation
+    networks:
+      - ecom-net
+
+  # ---------------------------------------------------------------------------
+  # Go API Gateway
+  # ---------------------------------------------------------------------------
+  go-server:
+    build:
+      context: ./go-server
+      dockerfile: Dockerfile
+    container_name: ecom-go-server
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      PYTHON_AGENT_URL: http://python-agent:8000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-ecom}:${POSTGRES_PASSWORD:-ecom_pass}@postgres:5432/${POSTGRES_DB:-ecom_agent}?sslmode=disable
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_SERVICE_NAME: go-server
+    depends_on:
+      postgres:
+        condition: service_healthy
+      python-agent:
+        condition: service_started
+    networks:
+      - ecom-net
+
+  # ---------------------------------------------------------------------------
+  # Observability stack
+  # ---------------------------------------------------------------------------
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.96.0
+    container_name: ecom-otel-collector
+    restart: unless-stopped
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    ports:
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+      - "8889:8889" # Prometheus exporter
+    volumes:
+      - ./observability/otel-collector.yml:/etc/otelcol-contrib/config.yaml:ro
+    networks:
+      - ecom-net
+
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: ecom-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - ecom-net
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    container_name: ecom-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    networks:
+      - ecom-net
+
+volumes:
+  postgres_data:
+  kafka_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  ecom-net:
+    driver: bridge

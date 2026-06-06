@@ -1,0 +1,124 @@
+{
+  "policies": [
+    {
+      "id": "policy-return-window",
+      "title": "Standard Return Window",
+      "type": "policy",
+      "content": "Customers may return eligible items within 30 days of the delivery date. The return window is calculated from the date the carrier marks the package as delivered. Items delivered more than 30 days ago are not eligible for return unless covered by manufacturer warranty or applicable consumer protection law."
+    },
+    {
+      "id": "policy-refund-tiers",
+      "title": "Refund Approval Tiers",
+      "type": "policy",
+      "content": "Refunds under fifty US dollars are automatically approved once the returned item is received and inspected. Refunds of fifty US dollars or more require manager review and may take up to three additional business days for approval. Refunds are issued to the original payment method."
+    },
+    {
+      "id": "policy-condition",
+      "title": "Acceptable Item Condition for Returns",
+      "type": "policy",
+      "content": "Returned items must be in their original condition: unworn, unwashed, with all tags attached, and in the original packaging when possible. Damaged or defective items received from the carrier may be returned as-is and qualify for a full refund regardless of condition."
+    },
+    {
+      "id": "policy-exchanges",
+      "title": "Exchange Policy",
+      "type": "policy",
+      "content": "Size and color exchanges are accepted within 30 days of delivery, subject to stock availability. If the desired replacement is out of stock, the customer may choose between a refund or store credit equal to the item's price. Exchanges do not incur restocking fees."
+    },
+    {
+      "id": "policy-final-sale",
+      "title": "Non-Returnable Items",
+      "type": "policy",
+      "content": "Final sale items, personalized products, perishable goods, and digital downloads are not eligible for return or exchange. Items marked 'Final Sale' on the product page or order confirmation cannot be refunded."
+    },
+    {
+      "id": "policy-shipping-times",
+      "title": "Standard Shipping Times",
+      "type": "policy",
+      "content": "Standard ground shipping takes three to seven business days after the order ships. Express shipping takes one to three business days. Shipments are considered delayed if they have not arrived within two business days after the estimated delivery date."
+    },
+    {
+      "id": "policy-tracking",
+      "title": "Order Tracking",
+      "type": "policy",
+      "content": "Customers receive a tracking number by email when their order ships. Tracking updates may take up to 24 hours to appear after the package is scanned by the carrier. If tracking has not updated for more than 5 business days, contact customer support to open an investigation with the carrier."
+    },
+    {
+      "id": "policy-damaged",
+      "title": "Damaged or Defective Items",
+      "type": "policy",
+      "content": "Items damaged during shipping or arriving defective should be reported within 7 days of delivery. Customers should retain the packaging and provide photos when possible. We will issue a full refund or send a replacement at no additional cost."
+    },
+    {
+      "id": "faq-how-to-return",
+      "title": "How do I start a return?",
+      "type": "faq",
+      "content": "To start a return, provide your order ID and the reason for the return. Our system will check eligibility against the return window and item condition rules, then generate a Return Merchandise Authorization (RMA) and a prepaid shipping label."
+    },
+    {
+      "id": "faq-refund-time",
+      "title": "When will I receive my refund?",
+      "type": "faq",
+      "content": "Refunds are processed within 1 to 3 business days after the returned item is received and inspected. Once processed, it may take an additional 5 to 10 business days for the refund to appear on your statement, depending on your bank or card issuer."
+    },
+    {
+      "id": "faq-exchange-process",
+      "title": "How do exchanges work?",
+      "type": "faq",
+      "content": "Exchanges follow a two-step flow: the original item is returned and a new order is placed for the replacement. If the replacement size or color is out of stock you will be offered a refund or store credit. There is no fee for exchanges within 30 days."
+    },
+    {
+      "id": "faq-wismo",
+      "title": "Where is my order?",
+      "type": "faq",
+      "content": "We can look up the live status of your order using your order ID. Status values include pending (not yet shipped), shipped (in transit, tracking available), delivered, and cancelled. If the order is delayed beyond its estimated delivery date by more than two business days we will open a carrier investigation."
+    },
+    {
+      "id": "faq-international",
+      "title": "Do you ship internationally?",
+      "type": "faq",
+      "content": "We currently ship to the United States, Canada, and the European Union. International orders may be subject to customs duties and taxes determined by the destination country, which are the responsibility of the recipient."
+    },
+    {
+      "id": "faq-cancel",
+      "title": "Can I cancel my order?",
+      "type": "faq",
+      "content": "Orders can be cancelled at any time before they enter the shipped status. Once shipped, the order must follow the standard return process after delivery."
+    },
+    {
+      "id": "faq-multiple-items",
+      "title": "Can I return only some items from an order?",
+      "type": "faq",
+      "content": "Yes. Partial returns are supported. Specify the SKUs you wish to return and the refund will be calculated on a per-item basis using the original unit price."
+    },
+    {
+      "id": "policy-escalation",
+      "title": "Human Escalation",
+      "type": "policy",
+      "content": "Requests are escalated to a human agent when: the customer explicitly asks for a human, the refund amount exceeds $500, the system has failed three or more times in the same conversation, or strong negative sentiment is detected. Escalated conversations are routed to the support queue with full context."
+    },
+    {
+      "id": "policy-fraud",
+      "title": "Fraud and Abuse Prevention",
+      "type": "policy",
+      "content": "Return and refund requests are subject to fraud screening. Accounts with an unusually high return rate or returns of items significantly different from what was shipped may be flagged for manual review and temporary account holds."
+    },
+    {
+      "id": "faq-receipt",
+      "title": "Do I need a receipt to return?",
+      "type": "faq",
+      "content": "No physical receipt is required. The order ID is sufficient to locate your purchase. If you do not have your order ID, the email address used at checkout can be used to look it up."
+    },
+    {
+      "id": "faq-store-credit",
+      "title": "Can I receive store credit instead of a refund?",
+      "type": "faq",
+      "content": "Yes, store credit is available as an alternative to a cash refund. Store credit is issued instantly upon return approval and does not require waiting for bank processing. Store credit does not expire."
+    },
+    {
+      "id": "policy-restocking-fee",
+      "title": "Restocking Fees",
+      "type": "policy",
+      "content": "There is no restocking fee for returns within 30 days. Returns initiated outside the standard window but accepted as a courtesy may incur a 15% restocking fee deducted from the refund."
+    }
+  ]
+}
