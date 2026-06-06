@@ -13,29 +13,20 @@ validation, and an automated evaluation harness.
 
 ---
 
-## Proof & demo (live stack)
+## System overview
 
-Screenshots from a running Docker stack — eval harness, Grafana dashboards,
-Prometheus metrics, and a real authenticated `/chat` response.
-
-| | |
-|:---:|:---:|
-| **System overview** | **Eval score summary** |
-| ![Architecture proof](docs/proof/architecture-proof.png) | ![Eval summary](docs/proof/eval-summary.png) |
-| **Grafana — agent performance** | **Grafana — latency & failures** |
-| ![Grafana agent performance](docs/proof/grafana-agent-performance.png) | ![Grafana latency](docs/proof/grafana-latency-failures.png) |
-| **Prometheus metrics** | **Live WISMO chat response** |
-| ![Prometheus metrics](docs/proof/prometheus-metrics.png) | ![Chat demo](docs/proof/chat-demo-wismo.png) |
-| **Eval by scope (returns / exchanges / WISMO)** | **Automated eval report** |
-| ![Eval by scope](docs/proof/eval-by-scope.png) | ![Eval report](docs/proof/eval-report.png) |
-| **Eval latency distribution** | |
-| ![Eval latency](docs/proof/eval-latency.png) | |
+![Architecture proof](docs/proof/architecture-proof.png)
 
 **Dataset scale:** **100 synthetic cases per agent scope** (300 total in
 `evaluation/dataset/`). Standard local eval runs **15 per scope (45 cases)** via
 `make eval-standard`; full 300-case runs use `make eval`. Stress-test with
 `make load-test` (100 concurrent users). Capture proof screenshots with
 `make proof`.
+
+Switching between environments is one line in `.env`:
+`LLM_PROVIDER=groq` or `LLM_PROVIDER=ollama`.
+
+---
 
 ## Run with Groq (cloud)
 
@@ -53,6 +44,13 @@ Prometheus metrics, and a real authenticated `/chat` response.
 Status codes: `200` × 100, errors: 0.
 
 ![Groq load test](docs/proof/load-test-groq.png)
+
+> Raw JSON: [`evaluation/reports/load-test-users100-20260606-143646.json`](evaluation/reports/load-test-users100-20260606-143646.json).
+> The Groq run captured load-test metrics only. Eval-harness scoring,
+> Grafana dashboards, and Prometheus screenshots below were captured against
+> the local Ollama stack — they exercise the same Go gateway, agents,
+> validation, circuit breaker, and pgVector memory pipeline that the Groq
+> load test ran through.
 
 ---
 
@@ -75,6 +73,13 @@ Status codes: `200` × 100, errors: 0.
 | Grounded rate | **~89%** |
 | Composite | **~0.72** |
 
+| | |
+|:---:|:---:|
+| **Eval score summary** | **Automated eval report** |
+| ![Eval summary](docs/proof/eval-summary.png) | ![Eval report](docs/proof/eval-report.png) |
+| **Eval by scope (returns / exchanges / WISMO)** | **Eval latency distribution** |
+| ![Eval by scope](docs/proof/eval-by-scope.png) | ![Eval latency](docs/proof/eval-latency.png) |
+
 ### Concurrent load test
 
 | Concurrency | Total | Success | p50 | p95 | Throughput |
@@ -84,8 +89,14 @@ Status codes: `200` × 100, errors: 0.
 
 ![Local load test](docs/proof/load-test-local.png)
 
-Switching between environments is one line in `.env`:
-`LLM_PROVIDER=groq` or `LLM_PROVIDER=ollama`.
+### Live stack — Grafana, Prometheus, real chat response
+
+| | |
+|:---:|:---:|
+| **Grafana — agent performance** | **Grafana — latency & failures** |
+| ![Grafana agent performance](docs/proof/grafana-agent-performance.png) | ![Grafana latency](docs/proof/grafana-latency-failures.png) |
+| **Prometheus metrics** | **Live WISMO chat response** |
+| ![Prometheus metrics](docs/proof/prometheus-metrics.png) | ![Chat demo](docs/proof/chat-demo-wismo.png) |
 
 ---
 
