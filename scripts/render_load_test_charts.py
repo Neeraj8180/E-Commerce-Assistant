@@ -1,9 +1,8 @@
-"""Render dedicated proof charts for the load-test results.
+"""Render proof charts for the load-test results.
 
-Produces three PNGs under docs/proof/:
-    load-test-groq.png        — Groq 100-concurrent run (the good one)
-    load-test-local.png       — Local Ollama runs at 5 and 100 concurrent
-    load-test-comparison.png  — Side-by-side Groq vs Local on shared axes
+Produces two PNGs under docs/proof/:
+    load-test-groq.png   — Groq 100-concurrent run
+    load-test-local.png  — Local Ollama runs at 5 and 100 concurrent
 
 Numbers are baked in from the actual runs captured earlier so the charts
 stay stable even if reports are pruned.
@@ -153,56 +152,10 @@ def render_local() -> None:
     _save(PROOF / "load-test-local.png")
 
 
-def render_comparison() -> None:
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5.5))
-
-    labels = ["Local Ollama\n(100-way)", "Local Ollama\n(5-way)", "Cloud Groq\n(100-way)"]
-    p50s = [LOCAL_RUNS[1]["p50_ms"], LOCAL_RUNS[0]["p50_ms"], GROQ_RUN["p50_ms"]]
-    p95s = [LOCAL_RUNS[1]["p95_ms"], LOCAL_RUNS[0]["p95_ms"], GROQ_RUN["p95_ms"]]
-    success_rates = [
-        LOCAL_RUNS[1]["success"] / LOCAL_RUNS[1]["total"] * 100,
-        LOCAL_RUNS[0]["success"] / LOCAL_RUNS[0]["total"] * 100,
-        GROQ_RUN["success"] / GROQ_RUN["total"] * 100,
-    ]
-    rps = [LOCAL_RUNS[1]["rps"], LOCAL_RUNS[0]["rps"], GROQ_RUN["rps"]]
-    colors = ["#dc2626", "#f59e0b", "#16a34a"]
-
-    width = 0.35
-    x = list(range(3))
-    ax1.bar([i - width / 2 for i in x], p50s, width, label="p50", color="#2563eb")
-    ax1.bar([i + width / 2 for i in x], p95s, width, label="p95", color="#7c3aed")
-    ax1.set_xticks(x)
-    ax1.set_xticklabels(labels)
-    ax1.set_ylabel("Latency (ms, log scale)")
-    ax1.set_yscale("log")
-    ax1.set_title("Latency comparison: local CPU Ollama vs hosted Groq")
-    ax1.legend()
-    for xi, val in zip([i - width / 2 for i in x], p50s):
-        ax1.text(xi, val * 1.05, f"{val/1000:.1f}s", ha="center", fontsize=9)
-    for xi, val in zip([i + width / 2 for i in x], p95s):
-        ax1.text(xi, val * 1.05, f"{val/1000:.1f}s", ha="center", fontsize=9)
-
-    bars = ax2.bar(labels, success_rates, color=colors)
-    ax2.set_ylim(0, 110)
-    ax2.set_ylabel("Success rate (%)")
-    ax2.set_title("Success rate and throughput")
-    for bar, sr, r in zip(bars, success_rates, rps):
-        ax2.text(
-            bar.get_x() + bar.get_width() / 2,
-            sr + 3,
-            f"{sr:.0f}% / {r} rps",
-            ha="center",
-            fontsize=10,
-        )
-
-    _save(PROOF / "load-test-comparison.png")
-
-
 def main() -> int:
     PROOF.mkdir(parents=True, exist_ok=True)
     render_groq()
     render_local()
-    render_comparison()
     return 0
 
 

@@ -28,10 +28,8 @@ Prometheus metrics, and a real authenticated `/chat` response.
 | ![Prometheus metrics](docs/proof/prometheus-metrics.png) | ![Chat demo](docs/proof/chat-demo-wismo.png) |
 | **Eval by scope (returns / exchanges / WISMO)** | **Automated eval report** |
 | ![Eval by scope](docs/proof/eval-by-scope.png) | ![Eval report](docs/proof/eval-report.png) |
-| **Eval latency distribution** | **Cloud load test — Groq, 100 concurrent users** |
-| ![Eval latency](docs/proof/eval-latency.png) | ![Groq load test](docs/proof/load-test-groq.png) |
-| **Local load test — Ollama (CPU-only, no GPU)** | **Comparison — Groq vs local Ollama** |
-| ![Local load test](docs/proof/load-test-local.png) | ![Load test comparison](docs/proof/load-test-comparison.png) |
+| **Eval latency distribution** | |
+| ![Eval latency](docs/proof/eval-latency.png) | |
 
 **Dataset scale:** **100 synthetic cases per agent scope** (300 total in
 `evaluation/dataset/`). Standard local eval runs **15 per scope (45 cases)** via
@@ -39,65 +37,55 @@ Prometheus metrics, and a real authenticated `/chat` response.
 `make load-test` (100 concurrent users). Capture proof screenshots with
 `make proof`.
 
-### Test environments (the system was benchmarked in two configurations)
+## Run with Groq (cloud)
 
-| Configuration | LLM (chat) | Embeddings | Hardware |
-|---|---|---|---|
-| **Local (Ollama)** | `llama3.2` via Ollama | `nomic-embed-text` (768-d) via Ollama | Developer laptop, **CPU-only, no GPU** |
-| **Cloud (Groq)** | `llama-3.3-70b-versatile` via Groq | `nomic-embed-text` via Ollama | Groq hosted inference + local laptop for everything else |
+**Stack:** `llama-3.3-70b-versatile` via Groq · `nomic-embed-text` via Ollama
+(embeddings) · pgVector memory · everything else identical.
 
-> **Why two environments?** The local run is the honest, low-resource baseline
-> any reviewer can reproduce. The Groq run shows the same code, the same
-> agents, and the same memory pipeline performing at production-grade latency
-> when the LLM bottleneck is removed. The `LLMProvider` interface
-> ([python-agent/app/llm/base.py](python-agent/app/llm/base.py)) makes the
-> swap a single `.env` change (`LLM_PROVIDER=ollama` or `groq`).
+### Concurrent load test — 100 users
 
-> **Local hardware note:** The local results below were captured on a laptop
-> with **no dedicated GPU** — Ollama runs `llama3.2` on CPU, so a single chat
-> turn already takes 10–30 s and Ollama queues concurrent requests onto one
-> compute slot. This is a device limitation, not an architecture limitation.
+100 parallel `/chat` requests, shuffled mix: **26 returns + 30 exchanges + 44 WISMO**.
 
-### Eval results (45-case standard run, local Ollama)
+| Concurrency | Total | Success | p50 | p95 | p99 | Avg | Throughput |
+|------------:|------:|--------:|----:|----:|----:|----:|-----------:|
+| **100**     |   100 |  **100%** | 9.0 s | 10.3 s | 10.3 s | 7.9 s | **9.65 req/s** |
 
-| Metric | Score | Assessment |
-|--------|-------|------------|
-| Intent accuracy | **100%** | Router + rules working — no change needed |
-| Task success | **~81%** | Conservative escalation + grounding fallbacks on edge cases |
-| Tool correctness | **~91%** | Solid — occasional missing refund tools on borderline approvals |
-| Grounded rate | **~89%** | Guardrails catch ~11% hallucination risk — working as designed |
-| Composite | **~0.72** | Dragged down by local latency band, not agent quality |
+Status codes: `200` × 100, errors: 0.
 
-These numbers are good enough to ship as a portfolio demo. Remaining outcome
-gaps are intentional safety choices (manager review vs auto-refund) and strict
-grounding — not broken routing.
+![Groq load test](docs/proof/load-test-groq.png)
 
-### Concurrent load test (real measurements)
+---
 
-**Cloud — Groq (`llama-3.3-70b-versatile`), 100 concurrent users, shuffled mixed queries (26 returns + 30 exchanges + 44 WISMO):**
+## Run locally (Ollama, CPU-only laptop, no GPU)
 
-| Concurrency | Total | Success | p50 | p95 | p99 | Throughput | Result |
-|------------:|------:|--------:|----:|----:|----:|-----------:|--------|
-| **100**     |   100 |  **100%** | 9.0 s | 10.3 s | 10.3 s | **9.65 req/s** | Clean run — all 3 query types in parallel, zero errors |
+**Stack:** `llama3.2` via Ollama · `nomic-embed-text` via Ollama · pgVector memory.
 
-**Local — Ollama (`llama3.2`, CPU-only laptop, no GPU):**
+> **Hardware note:** captured on a developer laptop with **no dedicated GPU**.
+> Ollama runs `llama3.2` on CPU, so a single chat turn already takes 10–30 s
+> and Ollama queues concurrent requests onto one compute slot. The numbers
+> below reflect that device limitation, not the architecture.
 
-| Concurrency | Total | Success | p50 | p95 | Throughput | Notes |
-|------------:|------:|--------:|----:|----:|-----------:|-------|
-| **5**       |    30 |   **80%** | 110 s | 179 s | 0.04 req/s | Realistic local baseline — bottleneck is Ollama on CPU, not the gateway |
-| **100**     |   100 |     4%  |  81 s |  82 s | 0.55 req/s | Stress test — circuit breaker fires, gateway protects the agent |
+### Eval results — 45-case standard run
 
-Each `/chat` turn runs **3 LLM hops** (router prompt + Q&A generate + 2
-embedding calls for memory search & index). With local CPU-only Ollama, that
-single compute slot is the limiting factor. With Groq handling chat
-completions, latency drops ~10x and the system sustains **9.65 req/s with
-100% success at 100-way parallel** — the same code, agents, validation,
-circuit breaker, and pgVector memory pipeline.
+| Metric | Score |
+|--------|-------|
+| Intent accuracy | **100%** |
+| Task success | **~81%** |
+| Tool correctness | **~91%** |
+| Grounded rate | **~89%** |
+| Composite | **~0.72** |
 
-The Go gateway, circuit breaker, retries, validation, and pgVector memory
-all behave identically in both runs. In production, swap `LLMProvider` for a
-hosted model (Groq, OpenAI, Bedrock, vLLM) and scale the Python agent
-horizontally — throughput then scales linearly with replicas.
+### Concurrent load test
+
+| Concurrency | Total | Success | p50 | p95 | Throughput |
+|------------:|------:|--------:|----:|----:|-----------:|
+| **5**       |    30 |   **80%** | 110 s | 179 s | 0.04 req/s |
+| **100**     |   100 |     4%  |  81 s |  82 s | 0.55 req/s |
+
+![Local load test](docs/proof/load-test-local.png)
+
+Switching between environments is one line in `.env`:
+`LLM_PROVIDER=groq` or `LLM_PROVIDER=ollama`.
 
 ---
 
